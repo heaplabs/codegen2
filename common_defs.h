@@ -85,6 +85,11 @@ struct FieldInfo {
 		return false;
 	}
 	string toString() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		return ss.str();
+		
 	}
 
 };
