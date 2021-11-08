@@ -108,5 +108,8 @@ struct error_pos {
 
 	};
 
+void generate_scala_play( const map<string, 
+		Table*> & table_details);
+
 #endif /* common_defs_h */
 

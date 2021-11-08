@@ -1,5 +1,5 @@
 
-OBJS= build/sql.tab.o build/sql-lex.yy.o
+OBJS= build/sql.tab.o build/sql-lex.yy.o build/driver.o
 SRC=sql.y sql-lex.l
 CC=g++ -g -O0 -std=c++11
 
@@ -7,6 +7,9 @@ CC=g++ -g -O0 -std=c++11
 
 code_gen.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS)
+
+build/driver.o: driver.cpp
+	$(CC) -std=c++11 -I. -c $< -o $@
 
 build/sql.tab.o: sql.tab.c sql.tab.h
 	$(CC) -std=c++11 -I. -c $< -o $@
