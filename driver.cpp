@@ -85,6 +85,44 @@ void generate_create(Table * t, stringstream & ss)
 
 }
 
+void generate_delete(Table * t, stringstream & ss)
+{
+	ss << "final def" << " " << " delete" << t->table_name << "("
+		<< endl
+		<< t->tenant_and_id_params_scala()
+		<< ")" << ": Try[Option[" << t->table_name << "]] = Try {"
+		<< "DB.autocommit { implicit session =>" << endl;
+	
+	ss << "sql\"\"\"" << endl
+	
+
+		<< "delete  from " << t->table_name << endl
+		<< "where " << endl
+		;
+	//ss << t->insert_stmt_keys();
+	//ss << ") values (" << endl;
+	//ss << t->insert_stmt_values();
+	//ss << ") on conflict do nothing" << endl
+
+	ss
+		<< "returning *;" << endl
+		<< "\"\"\"" << endl
+		<< "map(rs => fromDB(rs).get)" << endl
+		<< ".single" << endl
+		<< ".apply()" << endl;
+
+	ss 
+		<< " // closes autocommit " << endl
+		<< "}"	
+		<< endl; 
+
+
+	ss
+		<< " // closes fn " << endl
+		<< "}" << endl;
+
+}
+
 string generate_dao(Table * t)
 {
 	using std::stringstream;
@@ -103,6 +141,7 @@ string generate_dao(Table * t)
 	generate_fromDB(t, ss);
 
 	generate_create(t, ss);
+	generate_delete(t, ss);
 
 	ss
 		<< "// closes class " <<endl

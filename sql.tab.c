@@ -529,8 +529,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    26,    26,    27,    30,    46,    47,    51,    57,    66,
-      67,    71,    74,    81,    82
+       0,    26,    26,    27,    30,    46,    47,    51,    57,    68,
+      69,    73,    76,    83,    86
 };
 #endif
 
@@ -1365,22 +1365,24 @@ yyreduce:
                                           {
 	  	string f_name = *(yyvsp[-3].identifier);
 	  	string f_type = *(yyvsp[-2].identifier);
-		FieldInfo * a_field = new FieldInfo(f_name, f_type);
+		FieldInfo * a_field = new FieldInfo(
+			f_name, f_type, flag_info_vec);
 		field_info_vec.push_back(a_field);
+		flag_info_vec.resize(0);
 	}
-#line 1372 "sql.tab.c"
+#line 1374 "sql.tab.c"
     break;
 
   case 11:
-#line 71 "sql.y"
+#line 73 "sql.y"
                     {
 		flag_info_vec.push_back(new PrimaryKey());
 	}
-#line 1380 "sql.tab.c"
+#line 1382 "sql.tab.c"
     break;
 
   case 12:
-#line 74 "sql.y"
+#line 76 "sql.y"
                                                                {
 		string table_name = *(yyvsp[-3].identifier);
 		string field_name = *(yyvsp[-1].identifier);
@@ -1388,11 +1390,27 @@ yyreduce:
 			new ForeignKey(table_name, field_name)
 		);
 	}
-#line 1392 "sql.tab.c"
+#line 1394 "sql.tab.c"
+    break;
+
+  case 13:
+#line 83 "sql.y"
+                    {
+		flag_info_vec.push_back(new TenantId());
+	}
+#line 1402 "sql.tab.c"
+    break;
+
+  case 14:
+#line 86 "sql.y"
+                     {
+		flag_info_vec.push_back(new SearchKey());
+	}
+#line 1410 "sql.tab.c"
     break;
 
 
-#line 1396 "sql.tab.c"
+#line 1414 "sql.tab.c"
 
       default: break;
     }
@@ -1624,5 +1642,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 87 "sql.y"
+#line 93 "sql.y"
 

@@ -57,8 +57,10 @@ field_defn:
 	| identifier identifier ':' flags {
 	  	string f_name = *$1;
 	  	string f_type = *$2;
-		FieldInfo * a_field = new FieldInfo(f_name, f_type);
+		FieldInfo * a_field = new FieldInfo(
+			f_name, f_type, flag_info_vec);
 		field_info_vec.push_back(a_field);
+		flag_info_vec.resize(0);
 	}
 	;
 
@@ -78,8 +80,12 @@ flag:
 			new ForeignKey(table_name, field_name)
 		);
 	}
-	| TENANT_ID
-	| SEARCH_KEY
+	| TENANT_ID {
+		flag_info_vec.push_back(new TenantId());
+	}
+	| SEARCH_KEY {
+		flag_info_vec.push_back(new SearchKey());
+	}
 	;
 
 
