@@ -49,16 +49,28 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    CREATE = 258,
-    TABLE = 259,
-    table_name = 260,
-    identifier = 261
+    table_name = 258,
+    identifier = 259,
+    CREATE = 260,
+    TABLE = 261
   };
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef std::string YYSTYPE;
+union YYSTYPE
+{
+
+  /* create_stmt  */
+  Table* create_stmt;
+  /* table_name  */
+  std::string* table_name;
+  /* identifier  */
+  std::string* identifier;
+#line 71 "sql.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

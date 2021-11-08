@@ -14,10 +14,10 @@ build/sql.tab.o: sql.tab.c sql.tab.h
 build/sql-lex.yy.o: sql-lex.yy.c  sql.tab.h sql-lex.l
 	$(CC) -c $< -o $@
 
-sql.tab.h sql.tab.c: sql.y GNUmakefile
+sql.tab.h sql.tab.c: sql.y GNUmakefile common_defs.h
 	bison --defines sql.y
 
-sql-lex.yy.c: sql-lex.l 
+sql-lex.yy.c: sql-lex.l common_defs.h
 	flex --backup -o $@ $<
 
 clean:

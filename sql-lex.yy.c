@@ -381,7 +381,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    6,    7,    8,    9,   10,    9,
         9,    9,    9,    9,    9,   11,    9,    9,    9,    9,
         9,   12,    9,   13,    9,    9,    9,    9,    9,    9,
-        1,    1,    1,    1,    1,    1,    6,    7,    8,    9,
+        1,    1,    1,    1,    9,    1,    6,    7,    8,    9,
 
        10,    9,    9,    9,    9,    9,    9,   11,    9,    9,
         9,    9,    9,   12,    9,   13,    9,    9,    9,    9,
@@ -774,20 +774,22 @@ case 5:
 YY_RULE_SETUP
 #line 27 "sql-lex.l"
 {
+	string * id = new string(yytext);
+	yylval.identifier = id;
 	return identifier;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 31 "sql-lex.l"
+#line 33 "sql-lex.l"
 return yytext[0];
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 33 "sql-lex.l"
+#line 35 "sql-lex.l"
 ECHO;
 	YY_BREAK
-#line 791 "sql-lex.yy.c"
+#line 793 "sql-lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1792,7 +1794,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 33 "sql-lex.l"
+#line 35 "sql-lex.l"
 
 
 

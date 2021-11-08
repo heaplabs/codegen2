@@ -24,7 +24,9 @@
 	// discard newlines - we'll count them later
 }
 
-[a-zA-Z][a-zA-Z0-9]* {
+[a-zA-Z_][_a-zA-Z0-9]* {
+	string * id = new string(yytext);
+	yylval.identifier = id;
 	return identifier;
 }
 
