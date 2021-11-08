@@ -98,6 +98,7 @@ void generate_delete(Table * t, stringstream & ss)
 
 		<< "delete  from " << t->table_name << endl
 		<< "where " << endl
+		<< t->tenant_and_id_where_clause_sql()
 		;
 	//ss << t->insert_stmt_keys();
 	//ss << ") values (" << endl;

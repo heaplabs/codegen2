@@ -84,6 +84,8 @@ struct FieldInfo {
 		}
 		return false;
 	}
+	string toString() {
+	}
 
 };
 
@@ -186,6 +188,45 @@ struct Table {
 		}
 		return ss.str();
 	}
+
+	string tenant_and_id_where_clause_sql() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
+		for (int i= 0; i < field_info.size();  ++i) {
+			// vector<FlagInfo*> flag_info_vec = 
+			// 	field_info[i]->flag_info_vec;
+			if (field_info[i]->isPrimaryKey() ||
+				field_info[i]->isTenantKey())
+			{
+				//ss << field_name << " : " 
+				//	<< data_type << endl;
+				filtered_recs.push_back(
+					field_info[i]);
+			}
+
+		}
+
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = field_info[i]->field_name;
+			string data_type = field_info[i]->data_type ;
+			if (filtered_recs[i]->isPrimaryKey()) {
+				ss << field_name << " = " 
+					<< "$" << table_name 
+					<< field_name << endl;
+			} else {
+				ss << field_name << " = " 
+					<< "$" 
+					<< field_name << endl;
+			}
+			if (i != filtered_recs.size() - 1) {
+				ss << " AND ";
+			}
+		}
+		return ss.str();
+	}
+
 
 	string insert_stmt_keys() {
 		using std::stringstream;
