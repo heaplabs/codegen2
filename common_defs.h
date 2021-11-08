@@ -59,6 +59,22 @@ struct error_pos {
 			}
 			return ss.str();
 		}
+
+		string params_scala() {
+			using std::stringstream;
+			using std::endl;
+			stringstream ss;
+			for (int i= 0; i < field_info.size();  ++i) {
+				string field_name = field_info[i].field_name;
+				string data_type = field_info[i].data_type ;
+				ss << field_name << " : " 
+					<< data_type << endl;
+				if (i != field_info.size() - 1) {
+					ss << ",";
+				}
+			}
+			return ss.str();
+		}
 	};
 
 #endif /* common_defs_h */

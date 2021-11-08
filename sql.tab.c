@@ -1625,8 +1625,20 @@ void generate_fromDB(Table * t, stringstream & ss)
 		<< "): Try[" << t->table_name << "] = Try {" << endl;
 	ss << t->table_name << "(" << endl;
 	ss << t->wrapped_result_to_classtype_scala();
-	ss << ");" << endl;
+	ss << ")" << endl;
 	ss << "}" << endl;
+}
+
+void generate_create(Table * t, stringstream & ss)
+{
+	ss << "final def" << " " << " create" << t->table_name << "("
+		<< endl
+		<< t->params_scala()
+		<< ")" << ": Try[Option[" << t->table_name << "]] = Try {"
+		<< endl; 
+
+	ss << "}" << endl;
+
 }
 
 string generate_dao(Table * t)
@@ -1645,6 +1657,8 @@ string generate_dao(Table * t)
 	ss << "private implicit val session: AutoSession = AutoSession" << endl;
 
 	generate_fromDB(t, ss);
+
+	generate_create(t, ss);
 
 	ss << "}" << endl;
 
