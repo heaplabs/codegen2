@@ -43,6 +43,12 @@ struct error_pos {
 			}
 			return ss.str();
 		}
+		string wrapped_result_to_classtype_scala() {
+			using std::stringstream;
+			using std::endl;
+			stringstream ss;
+			return ss.str();
+		}
 	};
 
 #endif /* common_defs_h */
