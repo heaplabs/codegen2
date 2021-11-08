@@ -1,7 +1,7 @@
 
 OBJS= build/sql.tab.o build/sql-lex.yy.o
 SRC=sql.y sql-lex.l
-CC=g++ -g -O2 -std=c++11
+CC=g++ -g -O0 -std=c++11
 
 .PHONY: clean
 
