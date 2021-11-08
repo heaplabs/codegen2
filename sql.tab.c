@@ -68,13 +68,25 @@
 /* First part of user prologue.  */
 #line 1 "sql.y"
 
-	#include <string>
 	#include "common_defs.h"
 	int yylex(void);
 	using std::string;
 	void yyerror(char const *);
+	struct FieldInfo {
+		string field_name;
+		string data_type;
+		FieldInfo(string f_name, string d_type):
+			field_name(f_name), data_type(d_type)
+		{ }
+	};
+	vector <FieldInfo> field_info_vec;
+	struct Table {
+		string table_name;
+		vector<FieldInfo> * field_info;
+	};
+	map<string, Table*> table_details;
 
-#line 78 "sql.tab.c"
+#line 90 "sql.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -504,7 +516,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    16,    16,    17,    20,    25,    26
+       0,    28,    28,    29,    32,    37,    43
 };
 #endif
 
@@ -1295,8 +1307,30 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 5:
+#line 37 "sql.y"
+                                {
+	  	string f_name = yyvsp[-1];
+	  	string f_type = yyvsp[0];
+		FieldInfo a_field = FieldInfo(f_name, f_type);
+		field_info_vec.push_back(a_field);
+	}
+#line 1319 "sql.tab.c"
+    break;
 
-#line 1300 "sql.tab.c"
+  case 6:
+#line 43 "sql.y"
+                                                {
+	  	string f_name = yyvsp[-1];
+	  	string f_type = yyvsp[0];
+		FieldInfo a_field = FieldInfo(f_name, f_type);
+		field_info_vec.push_back(a_field);
+	}
+#line 1330 "sql.tab.c"
+    break;
+
+
+#line 1334 "sql.tab.c"
 
       default: break;
     }
@@ -1528,7 +1562,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 31 "sql.y"
+#line 53 "sql.y"
 
 
 #include <iostream>
