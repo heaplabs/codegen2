@@ -1635,9 +1635,30 @@ void generate_create(Table * t, stringstream & ss)
 		<< endl
 		<< t->params_scala()
 		<< ")" << ": Try[Option[" << t->table_name << "]] = Try {"
+		<< "DB.autocommit { implicit session =>" << endl;
+	
+	ss << "sql\"\"\"" << endl
+		<< "insert into " << t->table_name << endl
+		<< "(" << endl;
+	ss << t->insert_stmt_keys();
+	ss << ") values (" << endl;
+	ss << t->insert_stmt_values();
+	ss << ") on conflict do nothing" << endl
+		<< "returning *;" << endl
+		<< "\"\"\"" << endl
+		<< "map(rs => fromDB(rs).get)" << endl
+		<< ".single" << endl
+		<< ".apply()" << endl;
+
+	ss 
+		<< " // closes autocommit " << endl
+		<< "}"	
 		<< endl; 
 
-	ss << "}" << endl;
+
+	ss
+		<< " // closes fn " << endl
+		<< "}" << endl;
 
 }
 
@@ -1660,7 +1681,9 @@ string generate_dao(Table * t)
 
 	generate_create(t, ss);
 
-	ss << "}" << endl;
+	ss
+		<< "// closes class " <<endl
+		<< "}" << endl;
 
 	return ss.str();
 	
