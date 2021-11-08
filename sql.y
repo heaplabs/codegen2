@@ -89,6 +89,17 @@ int main() {
 	generate_scala_play(table_details);
 }
 
+void generate_fromDB(Table * t, stringstream & ss)
+{
+
+	ss << "private def fromDB(" << endl << "rs: WrappedResultSet" << endl
+		<< "): Try[" << t->table_name << "] = Try {" << endl;
+	ss << t->table_name << "(" << endl;
+	ss << t->wrapped_result_to_classtype_scala();
+	ss << ")" << endl;
+	ss << "}" << endl;
+}
+
 string generate_dao(Table * t)
 {
 	using std::stringstream;
@@ -104,13 +115,8 @@ string generate_dao(Table * t)
 		<< " extends  " << t->table_name << "Trait" << " { " << endl;
 	ss << "private implicit val session: AutoSession = AutoSession" << endl;
 
-	ss << "private def fromDB(" << endl << "rs: WrappedResultSet" << endl
-		<< "): Try[" << t->table_name << "] = Try {" << endl;
-	ss << t->table_name << "(" << endl;
-	ss << t->wrapped_result_to_classtype_scala();
-	ss << ");" << endl;
+	generate_fromDB(t, ss);
 
-	ss << "}" << endl;
 	ss << "}" << endl;
 
 	return ss.str();
