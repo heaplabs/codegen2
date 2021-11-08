@@ -16,6 +16,32 @@
 	return TABLE;
 }
 
+PRIMARY {
+	return PRIMARY;
+}
+
+TENANT_ID {
+	return TENANT_ID;
+}
+
+SEARCH_KEY {
+	return SEARCH_KEY;
+}
+
+
+KEY {
+	return KEY;
+}
+
+FOREIGN {
+	return FOREIGN;
+}
+
+REFERENCES {
+	return REFERENCES;
+}
+
+
 [ \t]+ {
 	// discard whitespace
 }

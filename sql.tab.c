@@ -73,11 +73,15 @@
 	using std::string;
 	void yyerror(char const *);
 
-	vector <FieldInfo> field_info_vec;
+	vector <FlagInfo*> flag_info_vec;
+	vector <FieldInfo*> field_info_vec;
 
 	map<string, Table*> table_details;
+	#include <iostream>
+	using std::cout;
+	using std::endl;
 
-#line 81 "sql.tab.c"
+#line 85 "sql.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -128,7 +132,13 @@ extern int yydebug;
     table_name = 258,
     identifier = 259,
     CREATE = 260,
-    TABLE = 261
+    TABLE = 261,
+    PRIMARY = 262,
+    KEY = 263,
+    FOREIGN = 264,
+    REFERENCES = 265,
+    SEARCH_KEY = 266,
+    TENANT_ID = 267
   };
 #endif
 
@@ -143,7 +153,7 @@ union YYSTYPE
   std::string* table_name;
   /* identifier  */
   std::string* identifier;
-#line 147 "sql.tab.c"
+#line 157 "sql.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -462,19 +472,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   13
+#define YYLAST   26
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
+#define YYNTOKENS  18
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  4
+#define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  6
+#define YYNRULES  14
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  17
+#define YYNSTATES  33
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   261
+#define YYMAXUTOK   267
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -490,8 +500,8 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       7,     8,     2,     2,    10,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     9,
+       7,     8,     2,     2,    16,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    17,     9,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -512,14 +522,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6
+       5,     6,    10,    11,    12,    13,    14,    15
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    21,    21,    22,    25,    36,    42
+       0,    26,    26,    27,    30,    46,    47,    51,    57,    66,
+      67,    71,    74,    81,    82
 };
 #endif
 
@@ -529,8 +540,9 @@ static const yytype_int8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "table_name", "identifier", "CREATE",
-  "TABLE", "'('", "')'", "';'", "','", "$accept", "create_stmt", "stmt",
-  "field_defns", YY_NULLPTR
+  "TABLE", "'('", "')'", "';'", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
+  "SEARCH_KEY", "TENANT_ID", "','", "':'", "$accept", "create_stmt",
+  "stmt", "field_defns", "field_defn", "flags", "flag", YY_NULLPTR
 };
 #endif
 
@@ -540,11 +552,11 @@ static const char *const yytname[] =
 static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,    40,    41,    59,
-      44
+     262,   263,   264,   265,   266,   267,    44,    58
 };
 # endif
 
-#define YYPACT_NINF (-8)
+#define YYPACT_NINF (-10)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -558,8 +570,10 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -2,    -8,     0,     2,    -8,    -8,     1,     3,     5,
-      -7,    -8,     4,     6,    -8,     7,    -8
+      -1,     3,   -10,     2,     6,   -10,   -10,     4,     8,     9,
+      -8,   -10,    -3,     7,     8,    -9,   -10,   -10,    10,    11,
+     -10,   -10,    14,   -10,   -10,     5,    -9,    13,   -10,    12,
+      16,    17,   -10
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -568,19 +582,21 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     2,     0,     0,     1,     3,     0,     0,     0,
-       0,     5,     0,     0,     4,     0,     6
+       0,     5,     7,     0,     0,     0,     4,     6,     0,     0,
+      14,    13,     8,     9,    11,     0,     0,     0,    10,     0,
+       0,     0,    12
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -8,     9,    -8,    -8
+     -10,    21,   -10,   -10,     1,   -10,     0
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    10
+      -1,     2,     3,    10,    11,    22,    23
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -588,34 +604,40 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       5,    12,     1,    13,     4,     1,     7,     9,     8,    11,
-      15,    16,     6,    14
+      13,    18,     5,    19,     1,    20,    21,     1,    14,     4,
+       7,     8,     9,    12,    15,    17,    16,    29,    27,    30,
+      31,    24,    25,    26,     6,    32,    28
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,     8,     5,    10,     6,     5,     4,     4,     7,     4,
-       4,     4,     3,     9
+       8,    10,     0,    12,     5,    14,    15,     5,    16,     6,
+       4,     7,     4,     4,    17,    14,     9,     4,    13,     7,
+       4,    11,    11,     9,     3,     8,    26
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,    12,    13,     6,     0,    12,     4,     7,     4,
-      14,     4,     8,    10,     9,     4,     4
+       0,     5,    19,    20,     6,     0,    19,     4,     7,     4,
+      21,    22,     4,     8,    16,    17,     9,    22,    10,    12,
+      14,    15,    23,    24,    11,    11,     9,    13,    24,     4,
+       7,     4,     8
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    11,    13,    13,    12,    14,    14
+       0,    18,    20,    20,    19,    21,    21,    22,    22,    23,
+      23,    24,    24,    24,    24
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     7,     2,     4
+       0,     2,     1,     2,     7,     1,     3,     2,     4,     1,
+       3,     2,     7,     1,     1
 };
 
 
@@ -1311,41 +1333,66 @@ yyreduce:
   switch (yyn)
     {
   case 4:
-#line 27 "sql.y"
+#line 32 "sql.y"
                 {
 		string * id = (yyvsp[-4].identifier);
 		string table_name(*id);
 		Table * t = new Table(table_name, field_info_vec);
 		(yyval.create_stmt) = t;
 		table_details[table_name] = t;
+		cout << "got new table: "
+			<< table_name
+			<< "field_info_vec sz: "
+			<< field_info_vec.size()
+			<< endl;
 	}
-#line 1323 "sql.tab.c"
+#line 1350 "sql.tab.c"
     break;
 
-  case 5:
-#line 36 "sql.y"
-                                {
+  case 7:
+#line 51 "sql.y"
+                              {
 	  	string f_name = *(yyvsp[-1].identifier);
 	  	string f_type = *(yyvsp[0].identifier);
-		FieldInfo a_field = FieldInfo(f_name, f_type);
+		FieldInfo * a_field = new FieldInfo(f_name, f_type);
 		field_info_vec.push_back(a_field);
 	}
-#line 1334 "sql.tab.c"
+#line 1361 "sql.tab.c"
     break;
 
-  case 6:
-#line 42 "sql.y"
-                                                {
-	  	string f_name = *(yyvsp[-1].identifier);
-	  	string f_type = *(yyvsp[0].identifier);
-		FieldInfo a_field = FieldInfo(f_name, f_type);
+  case 8:
+#line 57 "sql.y"
+                                          {
+	  	string f_name = *(yyvsp[-3].identifier);
+	  	string f_type = *(yyvsp[-2].identifier);
+		FieldInfo * a_field = new FieldInfo(f_name, f_type);
 		field_info_vec.push_back(a_field);
 	}
-#line 1345 "sql.tab.c"
+#line 1372 "sql.tab.c"
+    break;
+
+  case 11:
+#line 71 "sql.y"
+                    {
+		flag_info_vec.push_back(new PrimaryKey());
+	}
+#line 1380 "sql.tab.c"
+    break;
+
+  case 12:
+#line 74 "sql.y"
+                                                               {
+		string table_name = *(yyvsp[-3].identifier);
+		string field_name = *(yyvsp[-1].identifier);
+		flag_info_vec.push_back(
+			new ForeignKey(table_name, field_name)
+		);
+	}
+#line 1392 "sql.tab.c"
     break;
 
 
-#line 1349 "sql.tab.c"
+#line 1396 "sql.tab.c"
 
       default: break;
     }
@@ -1577,5 +1624,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 52 "sql.y"
+#line 87 "sql.y"
 

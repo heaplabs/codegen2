@@ -52,7 +52,13 @@ extern int yydebug;
     table_name = 258,
     identifier = 259,
     CREATE = 260,
-    TABLE = 261
+    TABLE = 261,
+    PRIMARY = 262,
+    KEY = 263,
+    FOREIGN = 264,
+    REFERENCES = 265,
+    SEARCH_KEY = 266,
+    TENANT_ID = 267
   };
 #endif
 
@@ -67,7 +73,7 @@ union YYSTYPE
   std::string* table_name;
   /* identifier  */
   std::string* identifier;
-#line 71 "sql.tab.h"
+#line 77 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
