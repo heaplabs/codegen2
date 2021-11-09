@@ -1,12 +1,12 @@
 
 OBJS= build/sql.tab.o build/sql-lex.yy.o build/driver.o
 SRC=sql.y sql-lex.l
-CC=g++ -g -O0 -std=c++11
+CC=g++ -g -O0 -std=c++17
 
 .PHONY: clean
 
 code_gen.exe: $(OBJS)
-	$(CC) -o $@ $(OBJS)
+	$(CC) -o $@ $(OBJS) -lstdc++fs
 
 build/driver.o: driver.cpp
 	$(CC) -std=c++11 -I. -c $< -o $@

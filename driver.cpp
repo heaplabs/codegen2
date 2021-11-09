@@ -14,18 +14,37 @@ void yyerror(char const * err)
 string generate_dao(Table * t);
 string generate_models(Table * t);
 string generate_controller(Table * t) ;
+#include <fstream>
+#include <experimental/filesystem>
 
+namespace fs = std::experimental::filesystem;
+//namespace filesystem = std::filesystem;
 void generate_scala_play( const map<string, Table*> & table_details)
 {
 	for(map<string, Table*>::const_iterator cit = 
 		table_details.begin(); cit != table_details.end();
 		++cit) {
+		// mkdir
+		string table_name = cit -> second -> table_name;
+		if (!fs::exists(table_name.c_str()) && fs::create_directory(table_name.c_str()) == false ) {
+				cout << "cant create directory: "
+					<< table_name << " for output files...exiting"
+					<< endl;
+				exit(3);
+		}
 		cout << "// ======= DAO " << cit->second->table_name <<  "  ====== " << endl;
-		cout << generate_dao(cit->second);
+		Table * t = cit->second;
+		string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAO.scala";
+		fstream dao(dao_fname, dao.out);
+		dao << generate_dao(cit->second);
 		cout << "// ======= Controller " << cit->second->table_name <<  "  ====== " << endl;
-		cout << generate_controller(cit->second);
+		string cntrl_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "Controller.scala";
+		fstream cntrl(cntrl_fname, cntrl.out);
+		cntrl << generate_controller(cit->second);
 		cout << "// ======= Models " << cit->second->table_name <<  "  ====== " << endl;
-		cout << generate_models(cit->second);
+		string model_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + ".scala";
+		fstream model(model_fname, model.out);
+		model << generate_models(cit->second);
 	}
 	
 }
@@ -53,9 +72,18 @@ void print_map_details(
 	}
 }
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 int main() {
 	int status = yyparse();
 	cout << " status: " << status << endl;
+	if (status != 0) {
+		cout << "error parsing file"
+			<< endl;
+		exit(2);
+	}
+
 	print_table_details(table_details);
 	extern map<string, string> postgres_to_scala_map;
 	print_map_details(postgres_to_scala_map);
