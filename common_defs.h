@@ -5,6 +5,7 @@
 #include <map>
 #include <sstream>
 #include <iostream>
+#include <cctype>
 using std::string;
 using std::vector;
 using std::map;
@@ -20,11 +21,15 @@ struct FlagInfo {
 	FlagInfo() {}
 	virtual bool isPrimaryKey() = 0;
 	virtual bool isTenantKey() = 0;
+	virtual string toString() = 0;
 };
 
 struct PrimaryKey: public FlagInfo {
 	bool isPrimaryKey() { return true; }
 	bool isTenantKey() { return false; }
+	string toString() {
+		return string("PRIMARY KEY" );
+	}
 };
 
 struct ForeignKey: public FlagInfo {
@@ -35,20 +40,56 @@ struct ForeignKey: public FlagInfo {
 	{ }
 	bool isPrimaryKey() { return false; }
 	bool isTenantKey() { return false; }
+	string toString() {
+		return string("FOREIGN KEY REFERENCES  " + table_name + "(" + field_name + ")" );
+	}
 };
 
 struct TenantId: public FlagInfo {
 	TenantId() {}
 	bool isPrimaryKey() { return false; }
 	bool isTenantKey() { return true; }
+	string toString() {
+		return string("TENANT_ID ");
+	}
 };
 
 struct SearchKey: public FlagInfo {
 	SearchKey() {}
 	bool isPrimaryKey() { return false; }
 	bool isTenantKey() { return false; }
+	string toString() {
+		return string("SEARCH_KEY ");
+	}
 };
 
+
+struct DefaultNow: public FlagInfo {
+	DefaultNow() {}
+	bool isPrimaryKey() { return false; }
+	bool isTenantKey() { return false; }
+	string toString() {
+		return string("DEFAULT now()");
+	}
+};
+
+struct NotNull: public FlagInfo {
+	NotNull() {}
+	bool isPrimaryKey() { return false; }
+	bool isTenantKey() { return false; }
+	string toString() {
+		return string("NOT NULL");
+	}
+};
+
+struct UniqueKey: public FlagInfo {
+	UniqueKey() {}
+	bool isPrimaryKey() { return false; }
+	bool isTenantKey() { return false; }
+	string toString() {
+		return string("UNIQUE");
+	}
+};
 
 
 struct FieldInfo {
@@ -88,6 +129,13 @@ struct FieldInfo {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
+		ss << "field_name: " << field_name
+			<< ", field_type: " << data_type ;
+		for (int i = 0; i < flag_info_vec.size(); ++i) {
+			ss << ' ' << flag_info_vec[i]->toString();
+		}
+		
+
 		return ss.str();
 		
 	}
@@ -112,15 +160,41 @@ struct Table {
 		cout << to_string() << endl;
 	}
 
+	string tableNameCapitalised() {
+		using std::endl;
+		using std::cout;
+		string s1 ( table_name);
+		s1[0] = toupper(s1[0]);
+		//cout << "tableNameSingularCapitalised: " << s1 << endl;
+		return s1;
+	}
+
+	string tableNameSingular() {
+		using std::endl;
+		using std::cout;
+		string s1 ( table_name.substr(0, table_name.size()-1));
+		return s1;
+	}
+
+	string tableNameSingularCapitalised() {
+		using std::endl;
+		using std::cout;
+		string s1 ( table_name.substr(0, table_name.size()-1));
+		s1[0] = toupper(s1[0]);
+		cout << "tableNameSingularCapitalised: " << s1 << endl;
+		return s1;
+	}
+
 	string to_string() {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
 		ss << "table_name: " << table_name << endl;
 		for (int i= 0; i < field_info.size();  ++i) {
-			ss << "field_name: " << field_info[i]->field_name
-				<< ", field_type: " << field_info[i]->data_type
-				<< endl;
+			//ss << "field_name: " << field_info[i]->field_name
+			//	<< ", field_type: " << field_info[i]->data_type
+			//	<< endl;
+			ss << field_info[i]->toString() << endl;
 		}
 		return ss.str();
 	}
@@ -129,16 +203,19 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		using std::cout;
+		//extern map<string, string> postgres_to_scala_map;
+		extern map<string, string> postgres_to_db_conv_map;
 		//cout << "ENTER wrapped_result_to_classtype_scala"
 		//	<< endl;
 		stringstream ss;
-		cout << "field_info.size(): " << field_info.size()
-			<< endl;
+		//cout << "field_info.size(): " << field_info.size()
+		//	<< endl;
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
 			ss << field_name << " = " 
-				<< " rs ." << data_type
+				<< " rs ." 
+				<< postgres_to_db_conv_map[data_type]
 				<< "(\"" << field_name << "\")" << endl;
 			if (i != field_info.size() - 1) {
 				ss << ",";
@@ -151,11 +228,13 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
+		extern map<string, string> postgres_to_scala_map;
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
 			ss << field_name << " : " 
-				<< data_type << endl;
+				<< postgres_to_scala_map[data_type]
+				<< endl;
 			if (i != field_info.size() - 1) {
 				ss << ",";
 			}
@@ -182,11 +261,12 @@ struct Table {
 
 		}
 
+		extern map<string, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
 			ss << field_name << " : " 
-				<< data_type << endl;
+				<< postgres_to_scala_map[data_type] << endl;
 			if (i != filtered_recs.size() - 1) {
 				ss << ",";
 			}

@@ -58,7 +58,16 @@ extern int yydebug;
     FOREIGN = 264,
     REFERENCES = 265,
     SEARCH_KEY = 266,
-    TENANT_ID = 267
+    TENANT_ID = 267,
+    now = 268,
+    DEFAULT = 269,
+    NOT = 270,
+    NULLL = 271,
+    UNIQUE = 272,
+    MAP = 273,
+    PostgresToScala = 274,
+    SCALA_DATATYPE = 275,
+    DB_CONV = 276
   };
 #endif
 
@@ -73,7 +82,7 @@ union YYSTYPE
   std::string* table_name;
   /* identifier  */
   std::string* identifier;
-#line 77 "sql.tab.h"
+#line 86 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

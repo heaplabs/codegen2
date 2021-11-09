@@ -41,6 +41,42 @@ REFERENCES {
 	return REFERENCES;
 }
 
+NOT {
+	return NOT;
+}
+
+NULL {
+	return NULLL;
+}
+
+DEFAULT {
+	return DEFAULT;
+}
+
+UNIQUE {
+	return UNIQUE;
+}
+
+now {
+	return now;
+}
+
+MAP {
+	return MAP;
+}
+
+DB_CONV {
+	return DB_CONV;
+}
+
+SCALA_DATATYPE {
+	return SCALA_DATATYPE;
+}
+
+PostgresToScala {
+	return PostgresToScala;
+}
+
 
 [ \t]+ {
 	// discard whitespace
