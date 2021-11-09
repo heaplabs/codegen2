@@ -320,10 +320,11 @@ struct Table {
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
-			ss << field_name << endl;
+			ss << "\t\t\t" << field_name ;
 			if (i != field_info.size() - 1) {
 				ss << ",";
 			}
+			ss << endl;
 		}
 		return ss.str();
 	}
@@ -335,9 +336,9 @@ struct Table {
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
-			ss << "$" << field_name << endl;
+			ss << "\t\t\t$" << field_name ;
 			if (i != field_info.size() - 1) {
-				ss << ",";
+				ss << ","<< endl;
 			}
 		}
 		return ss.str();

@@ -24,6 +24,8 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		cout << generate_dao(cit->second);
 		cout << "// ======= Controller " << cit->second->table_name <<  "  ====== " << endl;
 		cout << generate_controller(cit->second);
+		cout << "// ======= Models " << cit->second->table_name <<  "  ====== " << endl;
+		cout << generate_models(cit->second);
 	}
 	
 }
@@ -76,16 +78,18 @@ void generate_create(Table * t, stringstream & ss)
 	ss << "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		<< endl
 		<< t->params_scala()
-		<< ")" << ": Try[Option[" << t->tableNameSingularCapitalised() << "]] = Try {"
+		<< ")" << ": Try[Option["
+		<< t->tableNameSingularCapitalised()
+		<< "]] = Try {" << endl
 		<< "DB autocommit { implicit session =>" << endl;
 	
 	ss << "sql\"\"\"" << endl
-		<< "insert into " << t->table_name << endl
-		<< "(" << endl;
+		<< "\tinsert into " << t->table_name << endl
+		<< "\t\t(" << endl;
 	ss << t->insert_stmt_keys();
-	ss << ") values (" << endl;
-	ss << t->insert_stmt_values();
-	ss << ") on conflict do nothing" << endl
+	ss << "\t\t) values (" << endl;
+	ss << t->insert_stmt_values() << endl;
+	ss << "\t\t) on conflict do nothing" << endl
 		<< "returning *;" << endl
 		<< "\"\"\"" << endl
 		<< ".map(rs => fromDB(rs).get)" << endl
@@ -185,6 +189,30 @@ string generate_models(Table * t)
 	using std::stringstream;
 	stringstream ss;
 	using std::endl;
+	ss
+		<< "package api." << t->table_name
+		<< ".models" << endl;
+
+
+	ss
+		<< "import awscala.DateTime" << endl
+		<< "import play.api.libs.json.Json" << endl
+		<< endl
+		;
+	ss
+		<< "case class " << t->tableNameSingularCapitalised() << "(" << endl
+		<< t->params_scala()
+		<< ")" << endl
+		<< endl;
+
+	ss
+		<< "object " << t->tableNameSingularCapitalised() << "{" << endl
+		<< "implicit val writes = Json.writes["
+		<< t->tableNameSingularCapitalised() 
+		<< "]" << endl
+		<< "}" << endl;
+
+	return ss.str();
 }
 
 void generate_controller_getall(Table * t, stringstream & ss)
