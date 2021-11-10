@@ -125,8 +125,12 @@ int main() {
 void generate_fromDB(Table * t, stringstream & ss)
 {
 
-	ss << "def fromDB(" << endl << "rs: WrappedResultSet" << endl
-		<< "): Try[" << t->tableNameSingularCapitalised() << "] = Try {" << endl;
+	ss
+		<< "def fromDB(" << endl
+		<< "rs: WrappedResultSet" << endl
+		<< "): Try["
+		<< t->tableNameSingularCapitalised()
+		<< "] = Try {" << endl;
 	ss << t->tableNameSingularCapitalised() << "(" << endl;
 	ss << t->wrapped_result_to_classtype_scala();
 	ss << ")" << endl;
@@ -137,9 +141,12 @@ string gen_create_signature(Table *t)
 {
 	stringstream ss;
 	ss
-		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
-		<< endl
-		<< t->params_scala()
+		<< "final def"
+		<< " "
+		<< " create" << t->tableNameSingularCapitalised()
+		<< "(" << endl
+		//<< t->params_scala()
+		<< t->dao_create_params()
 		<< ")" << ": Try[Option["
 		<< t->tableNameSingularCapitalised()
 		<< "]]"
@@ -286,7 +293,12 @@ ClassAndTrait generate_dao(Table * t)
 		<< t->tableNameSingular()
 		<< "." << "dao" << endl;
 	ss << endl;
-	ss << "import "  << "api" << "." << t->table_name << "." << "models" << "." << t->tableNameSingularCapitalised();
+	ss << "import "  << "api" << "." << t->table_name << "." << "models" << ".{"
+		<< t->tableNameSingularCapitalised()
+		<< ", "
+		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< "}"
+		<< endl;
 	ss << endl;
 	ss << "import scalikejdbc.{AutoSession, DB, WrappedResultSet, scalikejdbcSQLInterpolationImplicitDef}" << endl;
 	ss << "import scala.util.Try" << endl;

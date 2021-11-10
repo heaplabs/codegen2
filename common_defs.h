@@ -268,6 +268,18 @@ struct Table {
 		return ss.str();
 	}
 
+	string dao_create_params() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		ss
+			<< valModelForCreate()
+			<< " : "
+			<< modelForCreate() << endl;
+
+		return ss.str();
+	}
+
 	string params_scala() {
 		using std::stringstream;
 		using std::endl;
@@ -396,11 +408,25 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
 		for (int i= 0; i < field_info.size();  ++i) {
-			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			// string field_name = field_info[i]->field_name;
+			// string data_type = field_info[i]->data_type ;
+			// ss << "\t\t\t" << field_name ;
+			// if (i != field_info.size() - 1) {
+			// 	ss << ",";
+			// }
+			// ss << endl;
+			if (field_info[i]->isPrimaryKey() ) {
+			} else {
+				filtered_recs.push_back(field_info[i]);
+			}
+		}
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
 			ss << "\t\t\t" << field_name ;
-			if (i != field_info.size() - 1) {
+			if (i != filtered_recs.size() - 1) {
 				ss << ",";
 			}
 			ss << endl;
@@ -412,11 +438,30 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
 		for (int i= 0; i < field_info.size();  ++i) {
-			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
-			ss << "\t\t\t$" << field_name ;
-			if (i != field_info.size() - 1) {
+			//string field_name = field_info[i]->field_name;
+			//string data_type = field_info[i]->data_type ;
+			//ss << "\t\t\t${"
+			//	<< valModelForCreate()
+			//	<< "."
+			//	<< field_name << "}" ;
+			//if (i != field_info.size() - 1) {
+			//	ss << ","<< endl;
+			//}
+			if (field_info[i]->isPrimaryKey() ) {
+			} else {
+				filtered_recs.push_back(field_info[i]);
+			}
+		}
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
+			ss << "\t\t\t${"
+				<< valModelForCreate()
+				<< "."
+				<< field_name << "}" ;
+			if (i != filtered_recs.size() - 1) {
 				ss << ","<< endl;
 			}
 		}
