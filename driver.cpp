@@ -290,7 +290,8 @@ ClassAndTrait generate_dao(Table * t)
 	stringstream ss_trait;
 	ss << "package " << "api"
 		<< "."
-		<< t->tableNameSingular()
+		//<< t->tableNameSingular()
+		<< t->table_name
 		<< "." << "dao" << endl;
 	ss << endl;
 	ss << "import "  << "api" << "." << t->table_name << "." << "models" << ".{"
