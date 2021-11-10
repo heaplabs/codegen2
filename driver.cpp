@@ -11,7 +11,16 @@ void yyerror(char const * err)
 	cout << "error while parsing: " << err << endl;
 }
 
-string generate_dao(Table * t);
+
+struct ClassAndTrait {
+	string defn;
+	string defn_trait;
+	ClassAndTrait(string p_defn, string p_defn_trait) :
+		defn(p_defn), defn_trait(p_defn_trait)
+	{ }
+};
+
+ClassAndTrait generate_dao(Table * t);
 string generate_models(Table * t);
 string generate_controller(Table * t) ;
 #include <fstream>
@@ -34,9 +43,18 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		}
 		cout << "// ======= DAO " << cit->second->table_name <<  "  ====== " << endl;
 		Table * t = cit->second;
-		string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAO.scala";
-		fstream dao(dao_fname, dao.out);
-		dao << generate_dao(cit->second);
+		ClassAndTrait dao_dao_trait = generate_dao(cit->second);
+		{
+			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAO.scala";
+			fstream dao(dao_fname, dao.out);
+			dao << dao_dao_trait.defn;
+		}
+		{
+			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "TraitDAO.scala";
+			fstream dao_trait(dao_fname, dao_trait.out);
+			dao_trait << dao_dao_trait.defn_trait;
+		}
+
 		cout << "// ======= Controller " << cit->second->table_name <<  "  ====== " << endl;
 		string cntrl_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "Controller.scala";
 		fstream cntrl(cntrl_fname, cntrl.out);
@@ -101,15 +119,26 @@ void generate_fromDB(Table * t, stringstream & ss)
 	ss << "}" << endl << endl;
 }
 
-void generate_create(Table * t, stringstream & ss)
+void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 {
-	ss << "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
+	ss 
+		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		<< endl
 		<< t->params_scala()
 		<< ")" << ": Try[Option["
 		<< t->tableNameSingularCapitalised()
-		<< "]] = Try {" << endl
+		<< "]]"
+		<< " = Try {" << endl
 		<< "DB autocommit { implicit session =>" << endl;
+
+	ss_trait 
+		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
+		<< endl
+		<< t->params_scala()
+		<< ")" << ": Try[Option["
+		<< t->tableNameSingularCapitalised()
+		<< "]]" << endl
+		<< endl;
 	
 	ss << "sql\"\"\"" << endl
 		<< "\tinsert into " << t->table_name << endl
@@ -138,17 +167,26 @@ void generate_create(Table * t, stringstream & ss)
 
 }
 
-void generate_delete(Table * t, stringstream & ss)
+void generate_delete(Table * t, stringstream & ss, stringstream & ss_trait)
 {
-	ss << "final def" << " " << " delete" << t->table_name << "("
+	ss
+		<< "final def" << " " << " delete" << t->table_name << "("
 		<< endl
 		<< t->tenant_and_id_params_scala()
-		<< ")" << ": Try[Option[" << t->table_name << "]] = Try {"
-		<< "DB.autocommit { implicit session =>" << endl;
-	
-	ss << "sql\"\"\"" << endl
-	
+		<< ")" << ": Try[Option[" << t->table_name << "]]" << endl
+		<< " = Try {"
+		<< "DB.autocommit { implicit session =>" 
+		<< endl
+		<< endl;
 
+	ss_trait 
+		<< "final def" << " " << " delete" << t->table_name << "("
+		<< endl
+		<< t->tenant_and_id_params_scala()
+		<< ")" << ": Try[Option[" << t->table_name << "]]" << endl;
+	
+	ss
+		<< "sql\"\"\"" << endl
 		<< "delete  from " << t->table_name << endl
 		<< "where " << endl
 		<< t->tenant_and_id_where_clause_sql()
@@ -178,11 +216,11 @@ void generate_delete(Table * t, stringstream & ss)
 
 }
 
-
-string generate_dao(Table * t)
+ClassAndTrait generate_dao(Table * t)
 {
 	using std::stringstream;
 	stringstream ss;
+	stringstream ss_trait;
 	ss << "package " << "api" 
 		<< "." 
 		<< t->tableNameSingular()
@@ -199,16 +237,41 @@ string generate_dao(Table * t)
 		<< t->tableNameSingularCapitalised() << "DAOTrait" << " { " << endl;
 	ss << "private implicit val session: AutoSession = AutoSession" << endl;
 
+	ss_trait
+		<< "package "
+		<< "api."
+		<< t->table_name
+		<< ".dao"<< endl;
+
+	ss_trait 
+		<< "import "
+		<< "api."
+		<< t->table_name 
+		<< ".models."
+		<< t->tableNameSingularCapitalised()
+		<< endl;
+
+	ss_trait << "import scala.util.Try" << endl;
+
+	ss_trait << "trait "
+		<< t->tableNameSingularCapitalised() 
+		<< "DAOTrait {"
+		<< endl;
+
 	generate_fromDB(t, ss);
 
-	generate_create(t, ss);
-	generate_delete(t, ss);
+	generate_create(t, ss, ss_trait);
+	generate_delete(t, ss, ss_trait);
 
 	ss
 		<< "// closes class " <<endl
 		<< "}" << endl;
 
-	return ss.str();
+	ss_trait << "}" << endl;
+	const string dao_op = ss.str();
+	const string dao_trait_op = ss_trait.str();
+
+	return ClassAndTrait(dao_op, dao_trait_op);
 	
 }
 
