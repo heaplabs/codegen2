@@ -119,8 +119,9 @@ void generate_fromDB(Table * t, stringstream & ss)
 	ss << "}" << endl << endl;
 }
 
-void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
+string gen_create_signature(Table *t)
 {
+	stringstream ss;
 	ss 
 		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		<< endl
@@ -128,16 +129,31 @@ void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 		<< ")" << ": Try[Option["
 		<< t->tableNameSingularCapitalised()
 		<< "]]"
+		<< endl;
+	return ss.str();
+}
+
+void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
+{
+	ss 
+		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
+		//<< endl
+		//<< t->params_scala()
+		//<< ")" << ": Try[Option["
+		//<< t->tableNameSingularCapitalised()
+		//<< "]]"
+		<< gen_create_signature(t)
 		<< " = Try {" << endl
 		<< "DB autocommit { implicit session =>" << endl;
 
 	ss_trait 
-		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
-		<< endl
-		<< t->params_scala()
-		<< ")" << ": Try[Option["
-		<< t->tableNameSingularCapitalised()
-		<< "]]" << endl
+		<< gen_create_signature(t)
+		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
+		//<< endl
+		//<< t->params_scala()
+		//<< ")" << ": Try[Option["
+		//<< t->tableNameSingularCapitalised()
+		//<< "]]" << endl
 		<< endl;
 	
 	ss << "sql\"\"\"" << endl
@@ -162,34 +178,63 @@ void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 	ss
 		<< " // closes fn " << endl
 		<< "}" << endl
-		<< endl
-		;
-
+		<< endl ;
 }
 
-void generate_delete(Table * t, stringstream & ss, stringstream & ss_trait)
+string gen_delete_signature(Table *t)
 {
+	stringstream ss;
 	ss
-		<< "final def" << " " << " delete" << t->table_name << "("
+		<< "final def" << " "
+		<< " delete" << t->tableNameSingularCapitalised()
+		<< "("
 		<< endl
 		<< t->tenant_and_id_params_scala()
-		<< ")" << ": Try[Option[" << t->table_name << "]]" << endl
-		<< " = Try {"
-		<< "DB.autocommit { implicit session =>" 
+		<< ")"
+		<< ": Try[Option["
+		<< t->tableNameSingularCapitalised() << "]]"
 		<< endl
 		<< endl;
+	return ss.str();
+}
+
+void generate_delete(Table * t,
+		stringstream & ss,
+		stringstream & ss_trait)
+{
+
+	string delete_signature = gen_delete_signature(t);
+	ss
+		<< delete_signature
+		<< " = Try {"
+		<< "DB.autocommit { implicit session =>" 
+		<< endl;
+
+		//<< "final def" << " "
+		//<< " delete" << t->tableNameSingularCapitalised()
+		//<< "("
+		//<< endl
+		//<< t->tenant_and_id_params_scala()
+		//<< ")"
+		//<< ": Try[Option[" << t->table_name << "]]" << endl
+		//<< " = Try {"
+		//<< "DB.autocommit { implicit session =>" 
+		//<< endl
+		//<< endl;
 
 	ss_trait 
-		<< "final def" << " " << " delete" << t->table_name << "("
-		<< endl
-		<< t->tenant_and_id_params_scala()
-		<< ")" << ": Try[Option[" << t->table_name << "]]" << endl;
+		<< delete_signature;
+
+		//<< "final def" << " " << " delete" << t->table_name << "("
+		//<< endl
+		//<< t->tenant_and_id_params_scala()
+		//<< ")" << ": Try[Option[" << t->table_name << "]]" << endl;
 	
 	ss
 		<< "sql\"\"\"" << endl
-		<< "delete  from " << t->table_name << endl
-		<< "where " << endl
-		<< t->tenant_and_id_where_clause_sql()
+		<< "\t\tdelete  from " << t->table_name << endl
+		<< "\t\twhere " << endl
+		<< "\t\t" << t->tenant_and_id_where_clause_sql()
 		;
 	//ss << t->insert_stmt_keys();
 	//ss << ") values (" << endl;
