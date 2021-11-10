@@ -111,7 +111,7 @@ int main() {
 void generate_fromDB(Table * t, stringstream & ss)
 {
 
-	ss << "private def fromDB(" << endl << "rs: WrappedResultSet" << endl
+	ss << "def fromDB(" << endl << "rs: WrappedResultSet" << endl
 		<< "): Try[" << t->tableNameSingularCapitalised() << "] = Try {" << endl;
 	ss << t->tableNameSingularCapitalised() << "(" << endl;
 	ss << t->wrapped_result_to_classtype_scala();
@@ -185,14 +185,14 @@ string gen_delete_signature(Table *t)
 {
 	stringstream ss;
 	ss
-		<< "final def" << " "
+		<< "def" << " "
 		<< " delete" << t->tableNameSingularCapitalised()
 		<< "("
 		<< endl
 		<< t->tenant_and_id_params_scala()
 		<< ")"
 		<< ": Try[Option["
-		<< t->tableNameSingularCapitalised() << "]]"
+		<< "Long" << "]]"
 		<< endl
 		<< endl;
 	return ss.str();
@@ -202,11 +202,14 @@ void generate_delete(Table * t,
 		stringstream & ss,
 		stringstream & ss_trait)
 {
-
 	string delete_signature = gen_delete_signature(t);
+
+	ss_trait 
+		<< delete_signature;
+
 	ss
 		<< delete_signature
-		<< " = Try {"
+		<< " = Try {" << endl
 		<< "DB.autocommit { implicit session =>" 
 		<< endl;
 
@@ -222,8 +225,6 @@ void generate_delete(Table * t,
 		//<< endl
 		//<< endl;
 
-	ss_trait 
-		<< delete_signature;
 
 		//<< "final def" << " " << " delete" << t->table_name << "("
 		//<< endl
@@ -242,12 +243,12 @@ void generate_delete(Table * t,
 	//ss << ") on conflict do nothing" << endl
 
 	ss
-		<< "returning id;" << endl
-		<< "\"\"\"" << endl
-		<< ".map(rs => fromDB(rs).get)" << endl
-		<< ".single()" << endl
-		<< ".apply()" << endl
-		<< ".get()" << endl;
+		<< "\treturning id;" << endl
+		<< "\t" << "\"\"\"" << endl
+		<< "\t.map(_.long(\"id\"))" << endl
+		<< "\t.single()" << endl
+		<< "\t.apply()" << endl
+		<< endl;
 
 	ss 
 		<< " // closes autocommit " << endl

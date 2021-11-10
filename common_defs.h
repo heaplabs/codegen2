@@ -91,6 +91,8 @@ struct UniqueKey: public FlagInfo {
 	}
 };
 
+string capitaliseSingular(string s);
+string capitalise(string s) ;
 
 struct FieldInfo {
 	string field_name;
@@ -140,7 +142,29 @@ struct FieldInfo {
 		
 	}
 
+	string fieldSingularCapitalised() {
+		//using std::endl;
+		//using std::cout;
+		//string s1 ( table_name.substr(0, table_name.size()-1));
+		//s1[0] = toupper(s1[0]);
+		//cout << "tableNameSingularCapitalised: " << s1 << endl;
+		//return s1;
+		return capitaliseSingular(field_name);
+	}
+
 };
+
+//{
+//	using std::endl;
+//	using std::cout;
+//	// assume suffix is "s" and we chop if off
+//	// obviously this is not going to work in a lot of
+//	// cases
+//	string s1 ( s.substr(0, s.size()-1));
+//	s1[0] = toupper(s1[0]);
+//	//cout << "tableNameSingularCapitalised: " << s1 << endl;
+//	return s1;
+//}
 
 struct Table {
 	string table_name;
@@ -161,12 +185,13 @@ struct Table {
 	}
 
 	string tableNameCapitalised() {
-		using std::endl;
-		using std::cout;
-		string s1 ( table_name);
-		s1[0] = toupper(s1[0]);
-		//cout << "tableNameSingularCapitalised: " << s1 << endl;
-		return s1;
+		//using std::endl;
+		//using std::cout;
+		//string s1 ( table_name);
+		//s1[0] = toupper(s1[0]);
+		////cout << "tableNameSingularCapitalised: " << s1 << endl;
+		//return s1;
+		return capitalise(table_name);
 	}
 
 	string tableNameSingular() {
@@ -177,12 +202,13 @@ struct Table {
 	}
 
 	string tableNameSingularCapitalised() {
-		using std::endl;
-		using std::cout;
-		string s1 ( table_name.substr(0, table_name.size()-1));
-		s1[0] = toupper(s1[0]);
-		cout << "tableNameSingularCapitalised: " << s1 << endl;
-		return s1;
+		//using std::endl;
+		//using std::cout;
+		//string s1 ( table_name.substr(0, table_name.size()-1));
+		//s1[0] = toupper(s1[0]);
+		//cout << "tableNameSingularCapitalised: " << s1 << endl;
+		//return s1;
+		return capitaliseSingular(table_name);
 	}
 
 	string to_string() {
@@ -265,7 +291,12 @@ struct Table {
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
-			ss << field_name << " : " 
+			ss
+				<< (field_info[i]->isPrimaryKey() ?
+					(tableNameSingular() +
+					capitalise(field_name))
+						: field_name) 
+				<< " : " 
 				<< postgres_to_scala_map[data_type] << endl;
 			if (i != filtered_recs.size() - 1) {
 				ss << ",";
@@ -298,8 +329,9 @@ struct Table {
 			string data_type = field_info[i]->data_type ;
 			if (filtered_recs[i]->isPrimaryKey()) {
 				ss << field_name << " = " 
-					<< "$" << table_name 
-					<< field_name << endl;
+					<< "$" << tableNameSingular() 
+					<< capitalise(field_name)
+					<< endl;
 			} else {
 				ss << field_name << " = " 
 					<< "$" 
