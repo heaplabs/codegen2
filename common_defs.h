@@ -93,6 +93,7 @@ struct UniqueKey: public FlagInfo {
 
 string capitaliseSingular(string s);
 string capitalise(string s) ;
+string singular(string s) ;
 
 struct FieldInfo {
 	string field_name;
@@ -192,6 +193,18 @@ struct Table {
 		////cout << "tableNameSingularCapitalised: " << s1 << endl;
 		//return s1;
 		return capitalise(table_name);
+	}
+
+	string modelForCreate() {
+		return capitaliseSingular(table_name) + "ForCreate";
+	}
+
+	//string valTableNameForCreate() {
+	//	return loweredCamelCase() + "ForCreate";
+	//}
+
+	string valModelForCreate() {
+		return singular(table_name) + "ForCreate";
 	}
 
 	string loweredCamelCase() {

@@ -32,7 +32,7 @@ namespace fs = std::experimental::filesystem;
 //namespace filesystem = std::filesystem;
 void generate_scala_play( const map<string, Table*> & table_details)
 {
-	for(map<string, Table*>::const_iterator cit = 
+	for(map<string, Table*>::const_iterator cit =
 		table_details.begin(); cit != table_details.end();
 		++cit) {
 		// mkdir
@@ -83,11 +83,11 @@ void generate_scala_play( const map<string, Table*> & table_details)
 
 void print_table_details( const map<string, Table*> & table_details)
 {
-	for(map<string, Table*>::const_iterator cit = 
+	for(map<string, Table*>::const_iterator cit =
 		table_details.begin(); cit != table_details.end();
 		++cit) {
-		cout << cit->first << endl 
-			<< cit->second->to_string() 
+		cout << cit->first << endl
+			<< cit->second->to_string()
 			<< endl;
 	}
 }
@@ -136,7 +136,7 @@ void generate_fromDB(Table * t, stringstream & ss)
 string gen_create_signature(Table *t)
 {
 	stringstream ss;
-	ss 
+	ss
 		<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		<< endl
 		<< t->params_scala()
@@ -149,7 +149,7 @@ string gen_create_signature(Table *t)
 
 void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 {
-	ss 
+	ss
 		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		//<< endl
 		//<< t->params_scala()
@@ -160,7 +160,7 @@ void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 		<< " = Try {" << endl
 		<< "DB autocommit { implicit session =>" << endl;
 
-	ss_trait 
+	ss_trait
 		<< gen_create_signature(t)
 		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
 		//<< endl
@@ -183,10 +183,10 @@ void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 		<< ".single" << endl
 		<< ".apply()" << endl;
 
-	ss 
+	ss
 		<< " // closes autocommit " << endl
 		<< "}"	
-		<< endl; 
+		<< endl;
 
 
 	ss
@@ -218,13 +218,13 @@ void generate_delete(Table * t,
 {
 	string delete_signature = gen_delete_signature(t);
 
-	ss_trait 
+	ss_trait
 		<< delete_signature;
 
 	ss
 		<< delete_signature
 		<< " = Try {" << endl
-		<< "DB.autocommit { implicit session =>" 
+		<< "DB.autocommit { implicit session =>"
 		<< endl;
 
 		//<< "final def" << " "
@@ -235,7 +235,7 @@ void generate_delete(Table * t,
 		//<< ")"
 		//<< ": Try[Option[" << t->table_name << "]]" << endl
 		//<< " = Try {"
-		//<< "DB.autocommit { implicit session =>" 
+		//<< "DB.autocommit { implicit session =>"
 		//<< endl
 		//<< endl;
 
@@ -264,10 +264,10 @@ void generate_delete(Table * t,
 		<< "\t.apply()" << endl
 		<< endl;
 
-	ss 
+	ss
 		<< " // closes autocommit " << endl
 		<< "}"	
-		<< endl; 
+		<< endl;
 
 
 	ss
@@ -281,8 +281,8 @@ ClassAndTrait generate_dao(Table * t)
 	using std::stringstream;
 	stringstream ss;
 	stringstream ss_trait;
-	ss << "package " << "api" 
-		<< "." 
+	ss << "package " << "api"
+		<< "."
 		<< t->tableNameSingular()
 		<< "." << "dao" << endl;
 	ss << endl;
@@ -292,7 +292,7 @@ ClassAndTrait generate_dao(Table * t)
 	ss << "import scala.util.Try" << endl;
 
 	ss << "class " << t->tableNameSingularCapitalised()
-		<< "DAO" << endl 
+		<< "DAO" << endl
 		<< " extends  "
 		<< t->tableNameSingularCapitalised() << "DAOTrait" << " { " << endl;
 	ss << "private implicit val session: AutoSession = AutoSession" << endl;
@@ -303,10 +303,10 @@ ClassAndTrait generate_dao(Table * t)
 		<< t->table_name
 		<< ".dao"<< endl;
 
-	ss_trait 
+	ss_trait
 		<< "import "
 		<< "api."
-		<< t->table_name 
+		<< t->table_name
 		<< ".models."
 		<< t->tableNameSingularCapitalised()
 		<< endl;
@@ -314,7 +314,7 @@ ClassAndTrait generate_dao(Table * t)
 	ss_trait << "import scala.util.Try" << endl;
 
 	ss_trait << "trait "
-		<< t->tableNameSingularCapitalised() 
+		<< t->tableNameSingularCapitalised()
 		<< "DAOTrait {"
 		<< endl;
 
@@ -335,13 +335,53 @@ ClassAndTrait generate_dao(Table * t)
 	
 }
 
+void generate_service_create(Table * t,
+		stringstream & ss,
+		stringstream & ss_trait)
+{
+	ss
+		<< "def" << " "
+		<< "createNew" << t->tableNameSingularCapitalised()
+		<< "(" << endl
+		<< t->valModelForCreate()
+		<< " : "
+		<< t->modelForCreate() << endl
+		<< ") : " << endl
+		<< "Either["
+		<< t->tableNameSingularCapitalised() << "CreateError"
+		<< ", "
+		<< t->tableNameSingularCapitalised()
+		<< "] = {" << endl
+		<< endl;
+	ss
+		<< t->loweredCamelCase() << "DAO" << endl
+		<< ".create" << t->tableNameSingularCapitalised()
+		<< "(" << endl
+		<< t->valModelForCreate() << " = " << t->valModelForCreate()
+		<< endl
+		<< ") match {" << endl
+		<< "\tcase Failure(exception) =>" << endl
+		<< "\t  Left(" << endl
+		<< "\t    " << t->tableNameSingularCapitalised() << "CreateError" << endl
+		<< "\t      .SQLException(err = exception)" << endl
+		<< "\t case Success(Some("<< t->valModelForCreate() << ")) => " << endl
+		<< "\t     Right(" << t->valModelForCreate() << ")"
+		<< "\t   )" << endl
+		<< "\t}" << endl;
+
+	ss
+		<< "}"
+		<< endl
+		<< endl;
+}
+
 ClassAndTrait  generate_service(Table * t)
 {
 	using std::stringstream;
 	stringstream ss;
 	stringstream ss_trait;
 
-	ss 
+	ss
 		<< "package "
 		<< "api" << "."
 		<< t->table_name
@@ -390,28 +430,28 @@ ClassAndTrait  generate_service(Table * t)
 	//
 	// == CreateError
 	ss
-		<< "sealed trait"
+		<< "sealed trait" << " "
 		<< t->tableNameSingularCapitalised() << "CreateError"
 		<< endl
 		<< endl;
 
 	// == UpdateError
 	ss
-		<< "sealed trait"
+		<< "sealed trait" << " "
 		<< t->tableNameSingularCapitalised() << "UpdateError"
 		<< endl
 		<< endl;
 
 	// == DeleteError
 	ss
-		<< "sealed trait"
+		<< "sealed trait" << " "
 		<< t->tableNameSingularCapitalised() << "DeleteError"
 		<< endl
 		<< endl;
 
 	// == GetError
 	ss
-		<< "sealed trait"
+		<< "sealed trait" << " "
 		<< t->tableNameSingularCapitalised() << "GetError"
 		<< endl
 		<< endl;
@@ -423,10 +463,13 @@ ClassAndTrait  generate_service(Table * t)
 		<< t->loweredCamelCase()
 		<< "DAO"
 		<< " : "
-		<< t->tableNameSingularCapitalised() 
+		<< t->tableNameSingularCapitalised()
 		<< "DAO" << endl
 		<< ") {" << endl
 		<< endl;
+
+	generate_service_create(t, ss, ss_trait);
+	
 
 	ss
 		<< "}"
@@ -459,7 +502,7 @@ string generate_models(Table * t)
 		<< "case class " << t->tableNameSingularCapitalised() << "(" << endl
 		<< t->params_scala()
 		<< ")" << endl
-		<< endl 
+		<< endl
 		<< endl;
 
 	ss
@@ -472,7 +515,7 @@ string generate_models(Table * t)
 	ss
 		<< "object " << t->tableNameSingularCapitalised() << "{" << endl
 		<< "implicit val writes = Json.writes["
-		<< t->tableNameSingularCapitalised() 
+		<< t->tableNameSingularCapitalised()
 		<< "]" << endl
 		<< "}" << endl;
 
@@ -486,7 +529,7 @@ void generate_controller_getall(Table * t, stringstream & ss)
 	ss
 		<< "def "
 		<< "getAll" << t->table_name
-		<< " = " 
+		<< " = "
 		<< " isLoggedIn { request => " << endl
 		<< "val res = request.Response" << endl
 		<< t->table_name << "Service"
@@ -542,22 +585,22 @@ void generate_controller_addSingleEntry(Table * t, stringstream & ss)
 string generate_controller(Table * t) {
 	using std::stringstream;
 	stringstream ss;
-	ss << "package " 
+	ss << "package "
 		<< "api" << "."
 		<< t->table_name
 		<< "."
 		<< "controllers"
 		<< endl;
 
-	ss 
+	ss
 		<< "import "
 		<< "api"
 		<< "."
 		<< "{CONSTANTS, CacheService}" << endl;
-	ss 
+	ss
 		<< "import "
 		<< "api"
-		<< "." 
+		<< "."
 		<< "accounts.{PermType, PermissionUtils}"<< endl;
 
 	ss
@@ -571,13 +614,13 @@ string generate_controller(Table * t) {
 		<< "import "
 		<< "api"
 		<< "."
-		<< t->table_name 
+		<< t->table_name
 		<< ".services.{"
 		<< t->table_name << "AddError" << ", "
-		<< t->table_name << "Service" 
+		<< t->table_name << "Service"
 		<< "}"
 		<< endl;
-	ss 
+	ss
 		<< "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl
 		<< "import play.api.mvc.{Action, Controller}" << endl
 		<< "import utils.Helpers" << endl;
@@ -592,7 +635,7 @@ string generate_controller(Table * t) {
 	generate_controller_addSingleEntry(t, ss);
 
 
-	ss 
+	ss
 		<< "// closes class" << endl
 		<< "}";
 	return ss.str();

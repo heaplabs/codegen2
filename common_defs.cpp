@@ -23,3 +23,8 @@ string capitalise(string s) {
 	return s1;
 }
 
+string singular(string s) 
+{
+	string s1 ( s.substr(0, s.size()-1));
+	return s1;
+}
