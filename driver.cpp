@@ -23,6 +23,8 @@ struct ClassAndTrait {
 ClassAndTrait generate_dao(Table * t);
 string generate_models(Table * t);
 string generate_controller(Table * t) ;
+ClassAndTrait generate_service(Table * t);
+
 #include <fstream>
 #include <experimental/filesystem>
 
@@ -43,14 +45,14 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		}
 		cout << "// ======= DAO " << cit->second->table_name <<  "  ====== " << endl;
 		Table * t = cit->second;
-		ClassAndTrait dao_dao_trait = generate_dao(cit->second);
+		ClassAndTrait dao_dao_trait = generate_dao(t);
 		{
 			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAO.scala";
 			fstream dao(dao_fname, dao.out);
 			dao << dao_dao_trait.defn;
 		}
 		{
-			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "TraitDAO.scala";
+			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAOTrait.scala";
 			fstream dao_trait(dao_fname, dao_trait.out);
 			dao_trait << dao_dao_trait.defn_trait;
 		}
@@ -63,6 +65,18 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		string model_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + ".scala";
 		fstream model(model_fname, model.out);
 		model << generate_models(cit->second);
+		cout << "// ======= Service " << cit->second->table_name <<  "  ====== " << endl;
+		ClassAndTrait service_service_trait = generate_service(t);
+		{
+			string service_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "Service.scala";
+			fstream service(service_fname, service.out);
+			service << service_service_trait.defn;
+		}
+		{
+			string service_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "ServiceTrait.scala";
+			fstream service_trait(service_fname, service_trait.out);
+			service_trait << service_service_trait.defn_trait;
+		}
 	}
 	
 }
@@ -321,6 +335,110 @@ ClassAndTrait generate_dao(Table * t)
 	
 }
 
+ClassAndTrait  generate_service(Table * t)
+{
+	using std::stringstream;
+	stringstream ss;
+	stringstream ss_trait;
+
+	ss 
+		<< "package "
+		<< "api" << "."
+		<< t->table_name
+		<< "."
+		<< "services" << endl
+		<< endl;
+	ss_trait
+		<< "package "
+		<< "api" << "."
+		<< t->table_name
+		<< "."
+		<< "services" << endl
+		<< endl;
+
+
+	ss
+		<< "import "
+		<< "api"
+		<< "."
+		<< t->table_name
+		<< "."
+		<< "dao"
+		<< ".{"
+		<< t->tableNameSingularCapitalised() << "DAO"
+		<< " }"
+		<< endl;
+	ss
+		<< "import "
+		<< "api"
+		<< "."
+		<< t->table_name
+		<< "." << "models" << "."
+		<< "{ "
+		<< t->tableNameSingularCapitalised()
+		<< " }"
+		<< endl;
+	ss
+		<< "import cats.syntax.either._"
+		<< endl;
+	ss
+		<< "import utils.jodatimeutils.JodaTimeUtils"
+		<< endl
+		<< endl;
+
+	// ERRORS
+	//
+	// == CreateError
+	ss
+		<< "sealed trait"
+		<< t->tableNameSingularCapitalised() << "CreateError"
+		<< endl
+		<< endl;
+
+	// == UpdateError
+	ss
+		<< "sealed trait"
+		<< t->tableNameSingularCapitalised() << "UpdateError"
+		<< endl
+		<< endl;
+
+	// == DeleteError
+	ss
+		<< "sealed trait"
+		<< t->tableNameSingularCapitalised() << "DeleteError"
+		<< endl
+		<< endl;
+
+	// == GetError
+	ss
+		<< "sealed trait"
+		<< t->tableNameSingularCapitalised() << "GetError"
+		<< endl
+		<< endl;
+
+	ss
+		<< "class " << t->tableNameSingularCapitalised()
+		<< "Service"
+		<< "(" << endl
+		<< t->loweredCamelCase()
+		<< "DAO"
+		<< " : "
+		<< t->tableNameSingularCapitalised() 
+		<< "DAO" << endl
+		<< ") {" << endl
+		<< endl;
+
+	ss
+		<< "}"
+		<< endl;
+
+
+	const string service_op = ss.str();
+	const string service_trait_op = ss_trait.str();
+
+	return ClassAndTrait(service_op, service_trait_op);
+}
+
 string generate_models(Table * t)
 {
 	using std::stringstream;
@@ -336,10 +454,19 @@ string generate_models(Table * t)
 		<< "import play.api.libs.json.Json" << endl
 		<< endl
 		;
+
 	ss
 		<< "case class " << t->tableNameSingularCapitalised() << "(" << endl
 		<< t->params_scala()
 		<< ")" << endl
+		<< endl 
+		<< endl;
+
+	ss
+		<< "case class " << t->tableNameSingularCapitalised() << "ForCreate(" << endl
+		<< t->params_scala_without_primary_key()
+		<< ")" << endl
+		<< endl
 		<< endl;
 
 	ss

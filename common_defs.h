@@ -194,6 +194,11 @@ struct Table {
 		return capitalise(table_name);
 	}
 
+	string loweredCamelCase() {
+		// FIXME
+		return table_name;
+	}
+
 	string tableNameSingular() {
 		using std::endl;
 		using std::cout;
@@ -262,6 +267,35 @@ struct Table {
 				<< postgres_to_scala_map[data_type]
 				<< endl;
 			if (i != field_info.size() - 1) {
+				ss << ",";
+			}
+		}
+		return ss.str();
+	}
+
+	string params_scala_without_primary_key() {
+		using std::stringstream;
+		using std::endl;
+		using std::cout;
+		stringstream ss;
+		vector <FieldInfo*> filtered_rows;
+		for (int i= 0; i < field_info.size();  ++i) {
+			//ss << field_info[i]->toString() 
+			//	<< endl;
+			if (field_info[i]->isPrimaryKey()) {
+			} else {
+				filtered_rows.
+					push_back(field_info[i]);
+			}
+		}
+		extern map<string, string> postgres_to_scala_map;
+		for (int i= 0; i < filtered_rows.size();  ++i) {
+			string field_name = filtered_rows[i]->field_name;
+			string data_type = filtered_rows[i]->data_type ;
+			ss << field_name << " : " 
+				<< postgres_to_scala_map[data_type]
+				<< endl;
+			if (i != filtered_rows.size() - 1) {
 				ss << ",";
 			}
 		}
