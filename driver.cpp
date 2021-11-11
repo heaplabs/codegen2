@@ -381,10 +381,9 @@ void generate_service_create(Table * t,
 		<< "\t\tcase Failure(exception) =>" << endl
 		<< "\t\t  Left(" << endl
 		<< "\t\t    " << t->tableNameSingularCapitalised() << "CreateError" << endl
-		<< "\t\t      .SQLException(err = exception)" << endl
-		<< "\t\t case Success(Some("<< t->valModelForCreate() << ")) => " << endl
-		<< "\t\t     Right(" << t->valModelForCreate() << ")"
-		<< "\t\t   )" << endl
+		<< "\t\t      .SQLException(err = exception))" << endl
+		<< "\t\tcase Success(Some("<< t->valModelForCreate() << ")) => " << endl
+		<< "\t\t     Right(" << t->valModelForCreate() << ")" << endl
 		<< "\t}" << endl;
 
 	ss
