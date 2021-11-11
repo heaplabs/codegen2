@@ -141,7 +141,7 @@ string gen_create_signature(Table *t)
 {
 	stringstream ss;
 	ss
-		<< "final def"
+		<< "def"
 		<< " "
 		<< " create" << t->tableNameSingularCapitalised()
 		<< "(" << endl
@@ -320,8 +320,11 @@ ClassAndTrait generate_dao(Table * t)
 		<< "import "
 		<< "api."
 		<< t->table_name
-		<< ".models."
+		<< ".models.{ "
 		<< t->tableNameSingularCapitalised()
+		<< ", "
+		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< " }" 
 		<< endl;
 
 	ss_trait << "import scala.util.Try" << endl;
@@ -359,7 +362,7 @@ void generate_service_create(Table * t,
 		<< t->valModelForCreate()
 		<< " : "
 		<< t->modelForCreate() << endl
-		<< ") : " << endl
+		<< ") : " 
 		<< "Either["
 		<< t->tableNameSingularCapitalised() << "CreateError"
 		<< ", "
@@ -367,19 +370,21 @@ void generate_service_create(Table * t,
 		<< "] = {" << endl
 		<< endl;
 	ss
-		<< t->loweredCamelCase() << "DAO" << endl
+		<< "\t" << t->loweredCamelCase() << "DAO" 
 		<< ".create" << t->tableNameSingularCapitalised()
 		<< "(" << endl
-		<< t->valModelForCreate() << " = " << t->valModelForCreate()
+		<< "\t\t" << t->valModelForCreate()
+		<< " = "
+		<< t->valModelForCreate()
 		<< endl
-		<< ") match {" << endl
-		<< "\tcase Failure(exception) =>" << endl
-		<< "\t  Left(" << endl
-		<< "\t    " << t->tableNameSingularCapitalised() << "CreateError" << endl
-		<< "\t      .SQLException(err = exception)" << endl
-		<< "\t case Success(Some("<< t->valModelForCreate() << ")) => " << endl
-		<< "\t     Right(" << t->valModelForCreate() << ")"
-		<< "\t   )" << endl
+		<< "\t) match {" << endl
+		<< "\t\tcase Failure(exception) =>" << endl
+		<< "\t\t  Left(" << endl
+		<< "\t\t    " << t->tableNameSingularCapitalised() << "CreateError" << endl
+		<< "\t\t      .SQLException(err = exception)" << endl
+		<< "\t\t case Success(Some("<< t->valModelForCreate() << ")) => " << endl
+		<< "\t\t     Right(" << t->valModelForCreate() << ")"
+		<< "\t\t   )" << endl
 		<< "\t}" << endl;
 
 	ss
@@ -421,22 +426,23 @@ ClassAndTrait  generate_service(Table * t)
 		<< t->tableNameSingularCapitalised() << "DAO"
 		<< " }"
 		<< endl;
+
 	ss
 		<< "import "
-		<< "api"
-		<< "."
-		<< t->table_name
-		<< "." << "models" << "."
-		<< "{ "
+		<< "api" << "." << t->table_name
+		<< "." << "models" << ".{"
 		<< t->tableNameSingularCapitalised()
-		<< " }"
+		<< ", "
+		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< "}"
 		<< endl;
 	ss
 		<< "import cats.syntax.either._"
 		<< endl;
 	ss
-		<< "import utils.jodatimeutils.JodaTimeUtils"
+		<< "// import utils.jodatimeutils.JodaTimeUtils"
 		<< endl
+		<< "import scala.util.{Failure, Success}"
 		<< endl;
 
 	// ERRORS
@@ -447,6 +453,16 @@ ClassAndTrait  generate_service(Table * t)
 		<< t->tableNameSingularCapitalised() << "CreateError"
 		<< endl
 		<< endl;
+	ss
+		<< "object " << t->tableNameSingularCapitalised()  << "CreateError"
+		<< " {" << endl;
+	ss
+		<< "\tcase class SQLException(err: Throwable) extends "
+		<< t->tableNameSingularCapitalised() << "CreateError" << endl
+		<< endl;
+	ss
+		<< "}" << endl;
+		
 
 	// == UpdateError
 	ss
