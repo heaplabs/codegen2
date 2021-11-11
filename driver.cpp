@@ -528,10 +528,23 @@ string generate_models(Table * t)
 		;
 
 	ss
-		<< "case class " << t->tableNameSingularCapitalised() << "(" << endl
+		<< "case class " << t->classNameModel() << "(" << endl
 		<< t->params_scala()
 		<< ")" << endl
 		<< endl
+		<< endl;
+
+	ss
+		<< "object " << t->classNameModel() << "{" << endl
+		<< "\timplicit val writes("
+		<< t->valModel()
+		<< ":"
+		<< t->classNameModel()
+		<< ") : JsValue = {" << endl
+		<< "\tJson.obj(" << endl
+		<< t->params_for_model_scala_to_json()
+		<< "\t      )" << endl
+		<< "}" << endl
 		<< endl;
 
 	ss
@@ -540,13 +553,6 @@ string generate_models(Table * t)
 		<< ")" << endl
 		<< endl
 		<< endl;
-
-	ss
-		<< "object " << t->tableNameSingularCapitalised() << "{" << endl
-		<< "implicit val writes = Json.writes["
-		<< t->tableNameSingularCapitalised()
-		<< "]" << endl
-		<< "}" << endl;
 
 	return ss.str();
 }

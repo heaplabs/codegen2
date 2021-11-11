@@ -211,6 +211,10 @@ struct Table {
 		return singular(table_name) ;
 	}
 
+	string classNameModel() {
+		return tableNameSingularCapitalised();
+	}
+
 	string loweredCamelCase() {
 		// FIXME
 		return table_name;
@@ -305,6 +309,30 @@ struct Table {
 				<< endl;
 			if (i != field_info.size() - 1) {
 				ss << ",";
+			}
+		}
+		return ss.str();
+	}
+
+	string params_for_model_scala_to_json() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		extern map<string, string> postgres_to_scala_map;
+		for (int i= 0; i < field_info.size();  ++i) {
+			string field_name = field_info[i]->field_name;
+			string data_type = field_info[i]->data_type ;
+			ss
+				<< "\t\t\""
+				<< field_name
+				<< "\""
+				<< " -> "
+				<< valModel()
+				<< "."
+				<< field_name
+				<< endl;
+			if (i != field_info.size() - 1) {
+				ss << "\t\t, ";
 			}
 		}
 		return ss.str();
