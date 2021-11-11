@@ -165,7 +165,7 @@ void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 		//<< "]]"
 		<< gen_create_signature(t)
 		<< " = Try {" << endl
-		<< "DB autocommit { implicit session =>" << endl;
+		<< "DB autoCommit { implicit session =>" << endl;
 
 	ss_trait
 		<< gen_create_signature(t)
@@ -231,7 +231,7 @@ void generate_delete(Table * t,
 	ss
 		<< delete_signature
 		<< " = Try {" << endl
-		<< "DB.autocommit { implicit session =>"
+		<< "DB.autoCommit { implicit session =>"
 		<< endl;
 
 		//<< "final def" << " "
