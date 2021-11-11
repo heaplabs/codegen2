@@ -110,7 +110,7 @@ struct FieldInfo {
 		field_name(f_name), data_type(d_type),
 		flag_info_vec()
 	{ }
-	bool isPrimaryKey() { 
+	bool isPrimaryKey() {
 		for (int i = 0; i < flag_info_vec.size();
 				++i) {
 			if (flag_info_vec[i]->isPrimaryKey()) {
@@ -119,7 +119,7 @@ struct FieldInfo {
 		}
 		return false;
 	}
-	bool isTenantKey() { 
+	bool isTenantKey() {
 		for (int i = 0; i < flag_info_vec.size();
 				++i) {
 			if (flag_info_vec[i]->isTenantKey()) {
@@ -180,7 +180,7 @@ struct Table {
 		using std::endl;
 
 		cout << "field_info.size() : "
-			<< field_info.size() 
+			<< field_info.size()
 			<< endl;
 		cout << to_string() << endl;
 	}
@@ -207,9 +207,21 @@ struct Table {
 		return singular(table_name) + "ForCreate";
 	}
 
+	string valModel() {
+		return singular(table_name) ;
+	}
+
 	string loweredCamelCase() {
 		// FIXME
 		return table_name;
+	}
+
+	string classNameController() {
+		return tableNameSingularCapitalised() + string("Controller");
+	}
+
+	string valService() {
+		return singular(table_name) + string("Service");
 	}
 
 	string tableNameSingular() {
@@ -257,8 +269,8 @@ struct Table {
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
-			ss << field_name << " = " 
-				<< " rs ." 
+			ss << field_name << " = "
+				<< " rs ."
 				<< postgres_to_db_conv_map[data_type]
 				<< "(\"" << field_name << "\")" << endl;
 			if (i != field_info.size() - 1) {
@@ -288,7 +300,7 @@ struct Table {
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
-			ss << field_name << " : " 
+			ss << field_name << " : "
 				<< postgres_to_scala_map[data_type]
 				<< endl;
 			if (i != field_info.size() - 1) {
@@ -305,7 +317,7 @@ struct Table {
 		stringstream ss;
 		vector <FieldInfo*> filtered_rows;
 		for (int i= 0; i < field_info.size();  ++i) {
-			//ss << field_info[i]->toString() 
+			//ss << field_info[i]->toString()
 			//	<< endl;
 			if (field_info[i]->isPrimaryKey()) {
 			} else {
@@ -317,7 +329,7 @@ struct Table {
 		for (int i= 0; i < filtered_rows.size();  ++i) {
 			string field_name = filtered_rows[i]->field_name;
 			string data_type = filtered_rows[i]->data_type ;
-			ss << field_name << " : " 
+			ss << field_name << " : "
 				<< postgres_to_scala_map[data_type]
 				<< endl;
 			if (i != filtered_rows.size() - 1) {
@@ -333,12 +345,12 @@ struct Table {
 		stringstream ss;
 		vector<FieldInfo*> filtered_recs;
 		for (int i= 0; i < field_info.size();  ++i) {
-			// vector<FlagInfo*> flag_info_vec = 
+			// vector<FlagInfo*> flag_info_vec =
 			// 	field_info[i]->flag_info_vec;
 			if (field_info[i]->isPrimaryKey() ||
 				field_info[i]->isTenantKey())
 			{
-				//ss << field_name << " : " 
+				//ss << field_name << " : "
 				//	<< data_type << endl;
 				filtered_recs.push_back(
 					field_info[i]);
@@ -354,8 +366,8 @@ struct Table {
 				<< (field_info[i]->isPrimaryKey() ?
 					(tableNameSingular() +
 					capitalise(field_name))
-						: field_name) 
-				<< " : " 
+						: field_name)
+				<< " : "
 				<< postgres_to_scala_map[data_type] << endl;
 			if (i != filtered_recs.size() - 1) {
 				ss << ",";
@@ -370,12 +382,12 @@ struct Table {
 		stringstream ss;
 		vector<FieldInfo*> filtered_recs;
 		for (int i= 0; i < field_info.size();  ++i) {
-			// vector<FlagInfo*> flag_info_vec = 
+			// vector<FlagInfo*> flag_info_vec =
 			// 	field_info[i]->flag_info_vec;
 			if (field_info[i]->isPrimaryKey() ||
 				field_info[i]->isTenantKey())
 			{
-				//ss << field_name << " : " 
+				//ss << field_name << " : "
 				//	<< data_type << endl;
 				filtered_recs.push_back(
 					field_info[i]);
@@ -387,13 +399,13 @@ struct Table {
 			string field_name = field_info[i]->field_name;
 			string data_type = field_info[i]->data_type ;
 			if (filtered_recs[i]->isPrimaryKey()) {
-				ss << field_name << " = " 
-					<< "$" << tableNameSingular() 
+				ss << field_name << " = "
+					<< "$" << tableNameSingular()
 					<< capitalise(field_name)
 					<< endl;
 			} else {
-				ss << field_name << " = " 
-					<< "$" 
+				ss << field_name << " = "
+					<< "$"
 					<< field_name << endl;
 			}
 			if (i != filtered_recs.size() - 1) {
@@ -468,9 +480,26 @@ struct Table {
 		return ss.str();
 	}
 
+	// create Client def controller
+	string controller_create_def() {
+		return string("create") +
+			tableNameSingularCapitalised();
+	}
+
+	// create Client def service
+	string service_create_def() {
+		return string("createNew") +
+			tableNameSingularCapitalised();
+	}
+
+	string createError() {
+		return tableNameSingularCapitalised() +
+			string("CreateError");
+	}
+
 };
 
-void generate_scala_play( const map<string, 
+void generate_scala_play( const map<string,
 	Table*> & table_details);
 
 #endif /* common_defs_h */

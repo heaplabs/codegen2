@@ -357,7 +357,8 @@ void generate_service_create(Table * t,
 {
 	ss
 		<< "def" << " "
-		<< "createNew" << t->tableNameSingularCapitalised()
+		//<< "createNew" << t->tableNameSingularCapitalised()
+		<< t->service_create_def()
 		<< "(" << endl
 		<< t->valModelForCreate()
 		<< " : "
@@ -610,6 +611,47 @@ void generate_controller_addSingleEntry(Table * t, stringstream & ss)
 		<< "}";
 }
 
+void generate_controller_hello(Table * t, stringstream & ss)
+{
+	ss << "def hello(): Action[AnyContent] = Action {" << endl;
+	ss << "    Logger.info(\"hello call for ClientController hello api/v1/support\")" << endl;
+	ss << "    val json = Json.obj(\""<< t->classNameController() << "\" -> \"hello\")" << endl;
+	ss << "" << endl;
+	ss << "    Ok(json)" << endl;
+	ss << "  }" << endl
+		<< endl;
+}
+
+
+void generate_controller_create(Table * t, stringstream & ss)
+{
+	using std::stringstream;
+	using std::endl;
+	ss << "def " << t->controller_create_def() << "(): Action[JsValue] =  Action.async(parse.json){ implicit request =>" << endl;
+	ss << "    Logger.info(s\"" << t->controller_create_def() << " recd req: ${request.body}\")" << endl;
+	ss << "    val validateData =request.body.validate["<< t->modelForCreate() << "]" << endl;
+	ss << "    val wrongRequest = new Exception(ERROR_INVALID_REQUEST)" << endl;
+	ss << "    //val Res = request.Response" << endl;
+	ss << "" << endl;
+	ss << "    validateData match {" << endl;
+	ss << "      case JsSuccess(value, _) =>" << endl;
+	ss << "        val account = " << t->valService() << "." << t->service_create_def() << "(value)" << endl;
+	ss << "        account match {" << endl;
+	ss << "          case Left("<< t->createError() << ".SQLException(err)) =>" << endl;
+	ss << "          //case Left( err) =>" << endl;
+	ss << "            //val organizationJson = Json.toJson(err)" << endl;
+	ss << "            Future.failed(err)" << endl;
+	ss << "" << endl;
+	ss << "          case Right(" << t->valModel() << ") => Future.successful(Ok(Json.toJson(" << t->valModel() << ") ))" << endl;
+	ss << "        }" << endl;
+	ss << "      case JsError(_) =>" << endl;
+	ss << "        Logger.info(\"Failed parsing request\")" << endl;
+	ss << "        Future.failed(wrongRequest)" << endl;
+	ss << "    }" << endl;
+	ss << "  }" << endl;
+	ss << endl;
+}
+
 string generate_controller(Table * t) {
 	using std::stringstream;
 	stringstream ss;
@@ -620,47 +662,67 @@ string generate_controller(Table * t) {
 		<< "controllers"
 		<< endl;
 
-	ss
-		<< "import "
-		<< "api"
-		<< "."
-		<< "{CONSTANTS, CacheService}" << endl;
-	ss
-		<< "import "
-		<< "api"
-		<< "."
-		<< "accounts.{PermType, PermissionUtils}"<< endl;
+	//ss
+	//	<< "import "
+	//	<< "api"
+	//	<< "."
+	//	<< "{CONSTANTS, CacheService}" << endl;
+	//ss
+	//	<< "import "
+	//	<< "api"
+	//	<< "."
+	//	<< "accounts.{PermType, PermissionUtils}"<< endl;
 
-	ss
-		<< "import "
-		<< "api"
-		<< "."
-		<< t->table_name
-		<< ".models."
-		<< t->table_name << "ForAdding" << endl;
-	ss
-		<< "import "
-		<< "api"
-		<< "."
-		<< t->table_name
-		<< ".services.{"
-		<< t->table_name << "AddError" << ", "
-		<< t->table_name << "Service"
-		<< "}"
+	//ss
+	//	<< "import "
+	//	<< "api"
+	//	<< "."
+	//	<< t->table_name
+	//	<< ".models."
+	//	<< t->table_name << "ForAdding" << endl;
+	//ss
+	//	<< "import "
+	//	<< "api"
+	//	<< "."
+	//	<< t->table_name
+	//	<< ".services.{"
+	//	<< t->table_name << "AddError" << ", "
+	//	<< t->table_name << "Service"
+	//	<< "}"
+	//	<< endl;
+	//ss
+	//	<< "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl
+	//	<< "import play.api.mvc.{Action, Controller}" << endl
+	//	<< "import utils.Helpers" << endl;
+	//	============ BEGIN imports ======
+	string capitalisedTableName = t->tableNameSingularCapitalised();
+
+	ss << "import api.CONSTANTS.API_MSGS.{ERROR_INVALID_REQUEST, ERROR_NOT_FOUND_ACCOUNT}" << endl;
+	ss << "import api.clients.models."<< capitalisedTableName << "ForCreate" << endl;
+	ss << "import api.clients.services.{"<< capitalisedTableName << "CreateError, ClientService}" << endl;
+	ss << "import play.api.Logger" << endl;
+	ss << "import play.api.mvc.{Action, AnyContent, Controller}" << endl;
+	ss << "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl;
+	ss << "" << endl;
+	ss << "import scala.concurrent.Future" << endl;
+	ss << "import scala.util.{Failure, Success}" << endl;
+	//	============ END imports ======
+	
+
+	ss << "class " << t->classNameController() << "(" << endl
+		<< t->valService()
+		<< " : " << capitalisedTableName
+		<< "Service" << endl
+		<< ") " << endl
+		<< "extends Controller " << endl
+		<< "// with PermissionUtils" << endl
+		<< "{" << endl
 		<< endl;
-	ss
-		<< "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl
-		<< "import play.api.mvc.{Action, Controller}" << endl
-		<< "import utils.Helpers" << endl;
 
-	ss << "class " << t->table_name << "Controller("
-		<< t->table_name << ":" << t->table_name << ","
-  		<< "protected val cacheService: CacheService"
-		<< ") extends Controller with PermissionUtils" << endl
-		<< "{" << endl;
-
-	generate_controller_getall(t, ss);
-	generate_controller_addSingleEntry(t, ss);
+	//generate_controller_getall(t, ss);
+	//generate_controller_addSingleEntry(t, ss);
+	generate_controller_hello(t, ss);
+	generate_controller_create(t, ss);
 
 
 	ss
