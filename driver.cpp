@@ -143,7 +143,7 @@ string gen_create_signature(Table *t)
 	ss
 		<< "def"
 		<< " "
-		<< " create" << t->tableNameSingularCapitalised()
+		<< t->fnCreateDAO()
 		<< "(" << endl
 		//<< t->params_scala()
 		<< t->dao_create_params()
@@ -420,14 +420,15 @@ void generate_service_create(Table * t,
 		<< t->modelForCreate() << endl
 		<< ") : " 
 		<< "Either["
-		<< t->tableNameSingularCapitalised() << "CreateError"
+		<< t->getError()
 		<< ", "
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< "] = {" << endl
 		<< endl;
+
 	ss
-		<< "\t" << t->loweredCamelCase() << "DAO" 
-		<< ".create" << t->tableNameSingularCapitalised()
+		<< "\t" << t->valDAO()
+		<< t->fnCreateDAO()
 		<< "(" << endl
 		<< "\t\t" << t->valModelForCreate()
 		<< " = "
@@ -447,6 +448,55 @@ void generate_service_create(Table * t,
 		<< endl
 		<< endl;
 }
+
+string generate_service_get_by_id_signature(Table * t)
+{
+	stringstream ss;
+	ss
+		<< "def "<< t->service_get_by_id_def()
+		<< "("
+		<< endl
+		<< t->tenant_and_id_params_scala()
+		<< endl
+		      << ") : "
+		<< "Either["
+		<< t->getError()<< ", "
+		<< t->model() 
+		<< "]"
+		<< endl;
+	return ss.str();
+}
+
+void generate_service_get_by_id (Table * t,
+		stringstream & ss,
+		stringstream & ss_trait)
+{
+	// ss << "def "<< t->service_get_by_id_def()
+	// 	<< "("
+	// 	<< endl
+	//   << t->tenant_and_id_params_scala()
+	//   << endl
+	// 	<< ") : "
+	//   << "Either["
+	//   << t->getError()<< ", "
+	//   << t->model() 
+	//   << "]"
+	//   << endl;
+	ss
+		<< generate_service_get_by_id_signature(t)
+		<< "= {"
+		<< endl;
+	ss << "  clientsDAO.getClient(clientId, org_id) match {" << endl;
+	ss << "    case Failure(exception) => Left(" << endl;
+	ss << "      ClientGetError.SQLException(err = exception))" << endl;
+	ss << "    case Success(None) =>" << endl;
+	ss << "      Left( ClientGetError.ClientNotFound)" << endl;
+	ss << "    case Success(Some(client)) =>" << endl;
+	ss << "      Right(client)" << endl;
+	ss << "  }" << endl;
+	ss << "}" << endl;
+}
+
 
 ClassAndTrait  generate_service(Table * t)
 {
@@ -508,16 +558,20 @@ ClassAndTrait  generate_service(Table * t)
 		<< t->tableNameSingularCapitalised() << "CreateError"
 		<< endl
 		<< endl;
+
 	ss
-		<< "object " << t->tableNameSingularCapitalised()  << "CreateError"
+		<< "object "
+		<< t->createError()
 		<< " {" << endl;
 	ss
 		<< "\tcase class SQLException(err: Throwable) extends "
-		<< t->tableNameSingularCapitalised() << "CreateError" << endl
+		<< t->createError()
+		<< endl
 		<< endl;
+
 	ss
 		<< "}" << endl;
-		
+
 
 	// == UpdateError
 	ss
@@ -536,9 +590,30 @@ ClassAndTrait  generate_service(Table * t)
 	// == GetError
 	ss
 		<< "sealed trait" << " "
-		<< t->tableNameSingularCapitalised() << "GetError"
+		<< t->getError()
 		<< endl
 		<< endl;
+
+	ss
+		<< "object "
+		<< t->getError()
+		<< " {" << endl;
+	ss
+		<< "\tcase class SQLException(err: Throwable) extends "
+		<< t->getError()
+		<< endl
+		<< endl;
+
+  	ss
+		<< "\tcase object "
+		<< t->getClientNotFoundError()
+		<< " extends "
+		<< t->getError()
+		<< endl
+		<< endl;
+
+	ss
+		<< "}" << endl;
 
 	ss
 		<< "class " << t->tableNameSingularCapitalised()
@@ -553,6 +628,7 @@ ClassAndTrait  generate_service(Table * t)
 		<< endl;
 
 	generate_service_create(t, ss, ss_trait);
+	generate_service_get_by_id(t, ss, ss_trait);
 	
 
 	ss

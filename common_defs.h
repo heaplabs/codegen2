@@ -195,6 +195,10 @@ struct Table {
 		return capitalise(table_name);
 	}
 
+	string model() {
+		return capitaliseSingular(table_name) ;
+	}
+
 	string modelForCreate() {
 		return capitaliseSingular(table_name) + "ForCreate";
 	}
@@ -540,9 +544,35 @@ struct Table {
 			tableNameSingularCapitalised();
 	}
 
+	// get Client def service
+	string service_get_by_id_def() {
+		return string("get") +
+			tableNameSingularCapitalised() +
+			string("ById");
+	}
+
 	string createError() {
 		return tableNameSingularCapitalised() +
 			string("CreateError");
+	}
+
+	string getError() {
+		return tableNameSingularCapitalised() +
+			string("GetError");
+	}
+
+	string getClientNotFoundError() {
+		return tableNameSingularCapitalised() +
+			string("NotFound");
+	}
+
+	string valDAO() {
+		return loweredCamelCase() + string("DAO");
+	}
+
+	string fnCreateDAO() {
+		return string("create") + 
+			tableNameSingularCapitalised();
 	}
 
 };
