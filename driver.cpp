@@ -37,7 +37,9 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		++cit) {
 		// mkdir
 		string table_name = cit -> second -> table_name;
-		if (!fs::exists(table_name.c_str()) && fs::create_directory(table_name.c_str()) == false ) {
+		if (!fs::exists(table_name.c_str())
+			&& fs::create_directory(table_name.c_str())
+			== false ) {
 				cout << "cant create directory: "
 					<< table_name << " for output files...exiting"
 					<< endl;
@@ -172,7 +174,8 @@ string gen_get_signature(Table *t)
 	return ss.str();
 }
 
-void generate_get(Table * t, stringstream & ss, stringstream & ss_trait)
+void generate_get(Table * t,
+		stringstream & ss, stringstream & ss_trait)
 {
 	ss
 		<< gen_get_signature(t)
@@ -208,27 +211,16 @@ void generate_get(Table * t, stringstream & ss, stringstream & ss_trait)
 		<< endl ;
 }
 
-void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
+void generate_create(Table * t, stringstream & ss,
+		stringstream & ss_trait)
 {
 	ss
-		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
-		//<< endl
-		//<< t->params_scala()
-		//<< ")" << ": Try[Option["
-		//<< t->tableNameSingularCapitalised()
-		//<< "]]"
 		<< gen_create_signature(t)
 		<< " = Try {" << endl
 		<< "DB autoCommit { implicit session =>" << endl;
 
 	ss_trait
 		<< gen_create_signature(t)
-		//<< "final def" << " " << " create" << t->tableNameSingularCapitalised() << "("
-		//<< endl
-		//<< t->params_scala()
-		//<< ")" << ": Try[Option["
-		//<< t->tableNameSingularCapitalised()
-		//<< "]]" << endl
 		<< endl;
 	
 	ss << "sql\"\"\"" << endl
@@ -288,34 +280,13 @@ void generate_delete(Table * t,
 		<< "DB.autoCommit { implicit session =>"
 		<< endl;
 
-		//<< "final def" << " "
-		//<< " delete" << t->tableNameSingularCapitalised()
-		//<< "("
-		//<< endl
-		//<< t->tenant_and_id_params_scala()
-		//<< ")"
-		//<< ": Try[Option[" << t->table_name << "]]" << endl
-		//<< " = Try {"
-		//<< "DB.autocommit { implicit session =>"
-		//<< endl
-		//<< endl;
 
-
-		//<< "final def" << " " << " delete" << t->table_name << "("
-		//<< endl
-		//<< t->tenant_and_id_params_scala()
-		//<< ")" << ": Try[Option[" << t->table_name << "]]" << endl;
-	
 	ss
 		<< "sql\"\"\"" << endl
 		<< "\t\tdelete  from " << t->table_name << endl
 		<< "\t\twhere " << endl
 		<< "\t\t" << t->tenant_and_id_where_clause_sql()
 		;
-	//ss << t->insert_stmt_keys();
-	//ss << ") values (" << endl;
-	//ss << t->insert_stmt_values();
-	//ss << ") on conflict do nothing" << endl
 
 	ss
 		<< "\treturning id;" << endl
@@ -348,7 +319,10 @@ ClassAndTrait generate_dao(Table * t)
 		<< t->table_name
 		<< "." << "dao" << endl;
 	ss << endl;
-	ss << "import "  << "api" << "." << t->table_name << "." << "models" << ".{"
+	ss
+		<< "import "
+		<< "api" << "." << t->table_name << "."
+		<< "models" << ".{"
 		<< t->model()
 		<< ", "
 		<< t->modelForCreate()
@@ -414,7 +388,6 @@ void generate_service_create(Table * t,
 {
 	ss
 		<< "def" << " "
-		//<< "createNew" << t->tableNameSingularCapitalised()
 		<< t->service_create_def()
 		<< "(" << endl
 		<< t->valModelForCreate()
@@ -475,17 +448,7 @@ void generate_service_get_by_id (Table * t,
 		stringstream & ss,
 		stringstream & ss_trait)
 {
-	// ss << "def "<< t->service_get_by_id_def()
-	// 	<< "("
-	// 	<< endl
-	//   << t->tenant_and_id_params_scala()
-	//   << endl
-	// 	<< ") : "
-	//   << "Either["
-	//   << t->getError()<< ", "
-	//   << t->model() 
-	//   << "]"
-	//   << endl;
+
 	ss
 		<< generate_service_get_by_id_signature(t)
 		<< "= {"
@@ -691,12 +654,6 @@ string generate_models(Table * t)
 		<< endl
 		<< endl;
 
-	//ss
-	//	<< "import awscala.DateTime" << endl
-	//	<< "import play.api.libs.json.Json" << endl
-	//	<< endl
-	//	;
-
 	ss
 		<< "case class " << t->classNameModel() << "(" << endl
 		<< t->params_scala()
@@ -706,7 +663,8 @@ string generate_models(Table * t)
 
 	ss
 		<< "object " << t->classNameModel() << "{" << endl
-		<< "\timplicit val writes = new Writes["<< t->classNameModel() << "] {" << endl
+		<< "\timplicit val writes = new Writes["
+		<< t->classNameModel() << "] {" << endl
 		<< "\t\tdef writes ("
 		<< t->valModel()
 		<< ":"
@@ -788,7 +746,9 @@ void generate_controller_addSingleEntry(Table * t, stringstream & ss)
 		<< "(parse.json) { request => " << endl
 		<< "val res = request.Response" << endl
 		<< "val acc = request.loggedinAccount" << endl
-		<< "request.body.validate[" << t->table_name << "] match {" << endl
+		<< "request.body.validate["
+		<< t->table_name
+		<< "] match {" << endl
 		<< "case JsError(errors) => " << endl
 		<< "  res.JsValidationError(errors = errors)" << endl
 		<< endl
@@ -854,39 +814,8 @@ string generate_controller(Table * t) {
 		<< "controllers"
 		<< endl;
 
-	//ss
-	//	<< "import "
-	//	<< "api"
-	//	<< "."
-	//	<< "{CONSTANTS, CacheService}" << endl;
-	//ss
-	//	<< "import "
-	//	<< "api"
-	//	<< "."
-	//	<< "accounts.{PermType, PermissionUtils}"<< endl;
-
-	//ss
-	//	<< "import "
-	//	<< "api"
-	//	<< "."
-	//	<< t->table_name
-	//	<< ".models."
-	//	<< t->table_name << "ForAdding" << endl;
-	//ss
-	//	<< "import "
-	//	<< "api"
-	//	<< "."
-	//	<< t->table_name
-	//	<< ".services.{"
-	//	<< t->table_name << "AddError" << ", "
-	//	<< t->table_name << "Service"
-	//	<< "}"
-	//	<< endl;
-	//ss
-	//	<< "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl
-	//	<< "import play.api.mvc.{Action, Controller}" << endl
-	//	<< "import utils.Helpers" << endl;
 	//	============ BEGIN imports ======
+
 	string capitalisedTableName = t->model();
 
 	ss << "import api.CONSTANTS.API_MSGS.{ERROR_INVALID_REQUEST, ERROR_NOT_FOUND_ACCOUNT}" << endl;
