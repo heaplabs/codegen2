@@ -878,10 +878,13 @@ string generate_controller(Table * t) {
 	//	<< "import play.api.mvc.{Action, Controller}" << endl
 	//	<< "import utils.Helpers" << endl;
 	//	============ BEGIN imports ======
-	string capitalisedTableName = t->tableNameSingularCapitalised();
+	string capitalisedTableName = t->model();
 
 	ss << "import api.CONSTANTS.API_MSGS.{ERROR_INVALID_REQUEST, ERROR_NOT_FOUND_ACCOUNT}" << endl;
-	ss << "import api.clients.models."<< capitalisedTableName << "ForCreate" << endl;
+	ss
+		<< "import api.clients.models."
+		<< t->modelForCreate()
+		<< endl;
 	ss << "import api.clients.services.{"<< capitalisedTableName << "CreateError, ClientService}" << endl;
 	ss << "import play.api.Logger" << endl;
 	ss << "import play.api.mvc.{Action, AnyContent, Controller}" << endl;
