@@ -564,6 +564,10 @@ struct Table {
 		return string("create") +
 			tableNameSingularCapitalised();
 	}
+	string controller_get_def() {
+		return string("get") +
+			tableNameSingularCapitalised();
+	}
 
 	// create Client def service
 	string service_create_def() {
@@ -688,6 +692,12 @@ struct Table {
 		string className = 
 			 tableNameSingularCapitalised()
 			+ "Service";
+		return className;
+	}
+
+	string serviceValName () {
+		string className = 
+			 singular(table_name) + "Service";
 		return className;
 	}
 

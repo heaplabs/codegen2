@@ -804,6 +804,55 @@ void generate_controller_create(Table * t, stringstream & ss)
 	ss << endl;
 }
 
+
+void generate_controller_get(Table * t, stringstream & ss)
+{
+	ss << "def" << " "
+		<< t->controller_get_def()
+		<< "("
+		//<< " client_id: Long, org_id: Long"
+		<< t->tenant_and_id_params_scala()
+		<< "): Action[AnyContent]" << endl;
+	ss << "  = Action.async { implicit request =>" << endl;
+	ss << "    Logger.info(s\""
+		<< t->controller_get_def()
+		<< " recd req: ${request.body}\")" << endl;
+	ss << "    val wrongRequest = new Exception(ERROR_INVALID_REQUEST)" << endl;
+	ss << "" << endl;
+	ss << "" << endl;
+	ss << "        val "
+		<< t->valModel()
+		<< " = "
+		<< t->serviceValName()
+		<< "."
+		<< t->service_get_by_id_def()
+		<< "(" << endl;
+	// params
+	ss << "          clientId = clientId," << endl;
+	ss << "          org_id = org_id"
+	// params end
+		<< ")" << endl;
+
+	ss
+		<< "        "
+		<< t->valModel()
+		<<" match {" << endl;
+	ss << "          case Left("
+		<< t->getError()
+		<< ".SQLException(err)) =>"
+		<< endl;
+	ss << "            Future.failed(err)" << endl;
+	ss << "" << endl;
+	ss << "          case Right("
+		<< t->valModel()
+		<< ") => Future.successful(Ok(Json.toJson("
+		<< t->valModel()
+		<< ") ))" << endl;
+	ss << "        }" << endl;
+	ss << "" << endl;
+	ss << "  }" << endl;
+}
+
 string generate_controller(Table * t) {
 	using std::stringstream;
 	stringstream ss;
@@ -823,7 +872,13 @@ string generate_controller(Table * t) {
 		<< "import api.clients.models."
 		<< t->modelForCreate()
 		<< endl;
-	ss << "import api.clients.services.{"<< capitalisedTableName << "CreateError, ClientService}" << endl;
+	ss << "import api.clients.services.{"
+		<< t->createError()
+		<< ", "
+		<< t->getError()
+		<< ", "
+		<< t->serviceClassName()
+		<< "}" << endl;
 	ss << "import play.api.Logger" << endl;
 	ss << "import play.api.mvc.{Action, AnyContent, Controller}" << endl;
 	ss << "import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}" << endl;
@@ -847,6 +902,7 @@ string generate_controller(Table * t) {
 	//generate_controller_addSingleEntry(t, ss);
 	generate_controller_hello(t, ss);
 	generate_controller_create(t, ss);
+	generate_controller_get(t, ss);
 
 
 	ss
