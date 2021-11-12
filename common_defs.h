@@ -239,16 +239,6 @@ struct Table {
 		return s1;
 	}
 
-	string tableNameSingularCapitalised() {
-		//using std::endl;
-		//using std::cout;
-		//string s1 ( table_name.substr(0, table_name.size()-1));
-		//s1[0] = toupper(s1[0]);
-		//cout << "tableNameSingularCapitalised: " << s1 << endl;
-		//return s1;
-		return capitaliseSingular(table_name);
-	}
-
 	string to_string() {
 		using std::stringstream;
 		using std::endl;
@@ -593,6 +583,16 @@ struct Table {
 			string("CreateError");
 	}
 
+	string updateError() {
+		return tableNameSingularCapitalised() +
+			string("UpdateError");
+	}
+
+	string deleteError() {
+		return tableNameSingularCapitalised() +
+			string("DeleteError");
+	}
+
 	string getError() {
 		return tableNameSingularCapitalised() +
 			string("GetError");
@@ -620,6 +620,86 @@ struct Table {
 	string fnGetDAO() {
 		return string("get") +
 			tableNameSingularCapitalised();
+	}
+
+	string modelFileName() {
+		string model_fname =  table_name
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ ".scala";
+		return model_fname;
+	}
+
+	string controllerFileName() {
+		string cntrl_fname =  table_name
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ "Controller.scala";
+		return cntrl_fname;
+	}
+
+	string daoFileName() {
+		string dao_fname =  table_name 
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ "DAO.scala";
+		return dao_fname;
+	}
+
+	string daoTraitFileName() {
+		string dao_fname =  table_name 
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ "DAOTrait.scala";
+		return dao_fname;
+	}
+
+	string daoClassName () {
+		string className = 
+			 tableNameSingularCapitalised()
+			+ "DAO";
+		return className;
+	}
+
+	string daoTraitName () {
+		string className = 
+			 tableNameSingularCapitalised()
+			+ "DAOTrait";
+		return className;
+	}
+
+	string serviceFileName() {
+		string service_fname =  table_name 
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ "Service.scala";
+		return service_fname;
+	}
+
+	string serviceTraitFileName() {
+		string service_fname =  table_name 
+			+ "/"
+			+ tableNameSingularCapitalised()
+			+ "ServiceTrait.scala";
+		return service_fname;
+	}
+
+	string serviceClassName () {
+		string className = 
+			 tableNameSingularCapitalised()
+			+ "Service";
+		return className;
+	}
+
+	private:
+	string tableNameSingularCapitalised() {
+		//using std::endl;
+		//using std::cout;
+		//string s1 ( table_name.substr(0, table_name.size()-1));
+		//s1[0] = toupper(s1[0]);
+		//cout << "tableNameSingularCapitalised: " << s1 << endl;
+		//return s1;
+		return capitaliseSingular(table_name);
 	}
 
 };

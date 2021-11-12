@@ -47,33 +47,33 @@ void generate_scala_play( const map<string, Table*> & table_details)
 		Table * t = cit->second;
 		ClassAndTrait dao_dao_trait = generate_dao(t);
 		{
-			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAO.scala";
+			string dao_fname =  t->daoFileName();
 			fstream dao(dao_fname, dao.out);
 			dao << dao_dao_trait.defn;
 		}
 		{
-			string dao_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "DAOTrait.scala";
+			string dao_fname =  t->daoTraitFileName();
 			fstream dao_trait(dao_fname, dao_trait.out);
 			dao_trait << dao_dao_trait.defn_trait;
 		}
 
 		cout << "// ======= Controller " << cit->second->table_name <<  "  ====== " << endl;
-		string cntrl_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "Controller.scala";
+		string cntrl_fname =  t->controllerFileName();
 		fstream cntrl(cntrl_fname, cntrl.out);
 		cntrl << generate_controller(cit->second);
 		cout << "// ======= Models " << cit->second->table_name <<  "  ====== " << endl;
-		string model_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + ".scala";
+		string model_fname =  t->modelFileName();
 		fstream model(model_fname, model.out);
 		model << generate_models(cit->second);
 		cout << "// ======= Service " << cit->second->table_name <<  "  ====== " << endl;
 		ClassAndTrait service_service_trait = generate_service(t);
 		{
-			string service_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "Service.scala";
+			string service_fname =  t->serviceFileName();
 			fstream service(service_fname, service.out);
 			service << service_service_trait.defn;
 		}
 		{
-			string service_fname =  t->table_name + "/" + t->tableNameSingularCapitalised() + "ServiceTrait.scala";
+			string service_fname =  t->serviceTraitFileName();
 			fstream service_trait(service_fname, service_trait.out);
 			service_trait << service_service_trait.defn_trait;
 		}
@@ -129,9 +129,9 @@ void generate_fromDB(Table * t, stringstream & ss)
 		<< "def fromDB(" << endl
 		<< "rs: WrappedResultSet" << endl
 		<< "): Try["
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< "] = Try {" << endl;
-	ss << t->tableNameSingularCapitalised() << "(" << endl;
+	ss << t->model() << "(" << endl;
 	ss << t->wrapped_result_to_classtype_scala();
 	ss << ")" << endl;
 	ss << "}" << endl << endl;
@@ -148,7 +148,7 @@ string gen_create_signature(Table *t)
 		//<< t->params_scala()
 		<< t->dao_create_params()
 		<< ")" << ": Try[Option["
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< "]]"
 		<< endl;
 	return ss.str();
@@ -160,13 +160,13 @@ string gen_get_signature(Table *t)
 	stringstream ss;
 	ss
 		<< "def" << " "
-		<< " get" << t->tableNameSingularCapitalised()
+		<< " get" << t->model()
 		<< "("
 		<< endl
 		<< t->tenant_and_id_params_scala()
 		<< ")"
 		<< ": Try[Option["
-		<< t->tableNameSingularCapitalised() << "]]"
+		<< t->model() << "]]"
 		<< endl
 		<< endl;
 	return ss.str();
@@ -349,19 +349,21 @@ ClassAndTrait generate_dao(Table * t)
 		<< "." << "dao" << endl;
 	ss << endl;
 	ss << "import "  << "api" << "." << t->table_name << "." << "models" << ".{"
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< ", "
-		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< t->modelForCreate()
 		<< "}"
 		<< endl;
 	ss << endl;
 	ss << "import scalikejdbc.{AutoSession, DB, WrappedResultSet, scalikejdbcSQLInterpolationImplicitDef}" << endl;
 	ss << "import scala.util.Try" << endl;
 
-	ss << "class " << t->tableNameSingularCapitalised()
-		<< "DAO" << endl
+	ss << "class "
+		<< t->daoClassName()
+		<< endl
 		<< " extends  "
-		<< t->tableNameSingularCapitalised() << "DAOTrait" << " { " << endl;
+		<< t->daoTraitName()
+		<< " { " << endl;
 	ss << "private implicit val session: AutoSession = AutoSession" << endl;
 
 	ss_trait
@@ -375,17 +377,17 @@ ClassAndTrait generate_dao(Table * t)
 		<< "api."
 		<< t->table_name
 		<< ".models.{ "
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< ", "
-		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< t->modelForCreate()
 		<< " }" 
 		<< endl;
 
 	ss_trait << "import scala.util.Try" << endl;
 
 	ss_trait << "trait "
-		<< t->tableNameSingularCapitalised()
-		<< "DAOTrait {"
+		<< t->daoTraitName()
+		<< " {"
 		<< endl;
 
 	generate_fromDB(t, ss);
@@ -438,7 +440,8 @@ void generate_service_create(Table * t,
 		<< "\t) match {" << endl
 		<< "\t\tcase Failure(exception) =>" << endl
 		<< "\t\t  Left(" << endl
-		<< "\t\t    " << t->tableNameSingularCapitalised() << "CreateError" << endl
+		<< "\t\t    " << t->createError()
+		<< endl
 		<< "\t\t      .SQLException(err = exception))" << endl
 		<< "\t\tcase Success(Some("<< t->valModelForCreate() << ")) => " << endl
 		<< "\t\t     Right(" << t->valModelForCreate() << ")" << endl
@@ -556,7 +559,7 @@ ClassAndTrait  generate_service(Table * t)
 		<< "."
 		<< "dao"
 		<< ".{"
-		<< t->tableNameSingularCapitalised() << "DAO"
+		<< t->daoClassName()
 		<< " }"
 		<< endl;
 
@@ -564,9 +567,9 @@ ClassAndTrait  generate_service(Table * t)
 		<< "import "
 		<< "api" << "." << t->table_name
 		<< "." << "models" << ".{"
-		<< t->tableNameSingularCapitalised()
+		<< t->model()
 		<< ", "
-		<< t->tableNameSingularCapitalised() << "ForCreate"
+		<< t->modelForCreate()
 		<< "}"
 		<< endl;
 	ss
@@ -583,7 +586,7 @@ ClassAndTrait  generate_service(Table * t)
 	// == CreateError
 	ss
 		<< "sealed trait" << " "
-		<< t->tableNameSingularCapitalised() << "CreateError"
+		<< t->modelForCreate()
 		<< endl
 		<< endl;
 
@@ -604,14 +607,14 @@ ClassAndTrait  generate_service(Table * t)
 	// == UpdateError
 	ss
 		<< "sealed trait" << " "
-		<< t->tableNameSingularCapitalised() << "UpdateError"
+		<< t->updateError()
 		<< endl
 		<< endl;
 
 	// == DeleteError
 	ss
 		<< "sealed trait" << " "
-		<< t->tableNameSingularCapitalised() << "DeleteError"
+		<< t->deleteError()
 		<< endl
 		<< endl;
 
@@ -644,14 +647,14 @@ ClassAndTrait  generate_service(Table * t)
 		<< "}" << endl;
 
 	ss
-		<< "class " << t->tableNameSingularCapitalised()
-		<< "Service"
+		<< "class "
+		<< t->serviceClassName()
 		<< "(" << endl
 		<< t->loweredCamelCase()
 		<< "DAO"
 		<< " : "
-		<< t->tableNameSingularCapitalised()
-		<< "DAO" << endl
+		<< t->daoClassName()
+		<< endl
 		<< ") {" << endl
 		<< endl;
 
@@ -718,15 +721,21 @@ string generate_models(Table * t)
 		<< endl;
 
 	ss
-		<< "case class " << t->tableNameSingularCapitalised() << "ForCreate(" << endl
+		<< "case class "
+		<< t->createError()
+		<< "(" << endl
 		<< t->params_scala_without_primary_key()
 		<< ")" << endl
 		<< endl
 		<< endl;
 
 	ss
-		<< "object " << t->tableNameSingularCapitalised() << "ForCreate {" << endl
-		<< "implicit val reads = Json.reads["<< t->tableNameSingularCapitalised() << "ForCreate" << "]" << endl
+		<< "object "
+		<< t->createError()
+		<< " {" << endl
+		<< "implicit val reads = Json.reads["
+		<< t->modelForCreate()
+		<< "]" << endl
 		<< "}" << endl
 		<< endl
 		<< endl;
