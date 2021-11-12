@@ -261,7 +261,7 @@ string gen_delete_signature(Table *t)
 	stringstream ss;
 	ss
 		<< "def" << " "
-		<< " delete" << t->tableNameSingularCapitalised()
+		<< t->fnDeleteDAO()
 		<< "("
 		<< endl
 		<< t->tenant_and_id_params_scala()
@@ -420,7 +420,7 @@ void generate_service_create(Table * t,
 		<< t->modelForCreate() << endl
 		<< ") : " 
 		<< "Either["
-		<< t->getError()
+		<< t->createError()
 		<< ", "
 		<< t->model()
 		<< "] = {" << endl
@@ -428,6 +428,7 @@ void generate_service_create(Table * t,
 
 	ss
 		<< "\t" << t->valDAO()
+		<< "."
 		<< t->fnCreateDAO()
 		<< "(" << endl
 		<< "\t\t" << t->valModelForCreate()
@@ -486,15 +487,42 @@ void generate_service_get_by_id (Table * t,
 		<< generate_service_get_by_id_signature(t)
 		<< "= {"
 		<< endl;
-	ss << "  clientsDAO.getClient(clientId, org_id) match {" << endl;
-	ss << "    case Failure(exception) => Left(" << endl;
-	ss << "      ClientGetError.SQLException(err = exception))" << endl;
-	ss << "    case Success(None) =>" << endl;
-	ss << "      Left( ClientGetError.ClientNotFound)" << endl;
-	ss << "    case Success(Some(client)) =>" << endl;
-	ss << "      Right(client)" << endl;
-	ss << "  }" << endl;
-	ss << "}" << endl;
+	ss << "  "
+		<< t->valDAO()
+		<< "."
+		<<  t->fnGetDAO()
+		<< "("
+		<< t->tenant_and_id_vars_scala()
+		<< ") match {" << endl;
+	ss
+		<< "    case Failure(exception) => Left(" << endl;
+	ss
+		<< "      "
+		<< t->getError()
+		<< ".SQLException(err = exception))" << endl;
+	ss
+		<< "    case Success(None) =>" << endl;
+	ss
+		<< "      Left("
+		<< t->getError()
+		<< "."
+		<< t->getClientNotFoundError()
+		<< ")" << endl;
+	ss
+		<< "    "
+		<< "case Success(Some("
+		<< t->valModel()
+		<< ")) =>" << endl;
+	ss
+		<< "      "
+		<< "Right("
+		<< t->valModel()
+		<< ")" << endl;
+	ss
+		<< "  }" << endl;
+	ss
+		<< "// closes fn " << endl
+		<< "}" << endl;
 }
 
 
