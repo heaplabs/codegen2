@@ -474,6 +474,26 @@ struct Table {
 		return ss.str();
 	}
 
+	string all_db_keys() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
+		for (int i= 0; i < field_info.size();  ++i) {
+			filtered_recs.push_back(field_info[i]);
+		}
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
+			ss << "\t\t\t" << field_name ;
+			if (i != filtered_recs.size() - 1) {
+				ss << ",";
+			}
+			ss << endl;
+		}
+		return ss.str();
+	}
+
 	string insert_stmt_values() {
 		using std::stringstream;
 		using std::endl;

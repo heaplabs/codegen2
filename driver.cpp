@@ -154,6 +154,60 @@ string gen_create_signature(Table *t)
 	return ss.str();
 }
 
+
+string gen_get_signature(Table *t)
+{
+	stringstream ss;
+	ss
+		<< "def" << " "
+		<< " get" << t->tableNameSingularCapitalised()
+		<< "("
+		<< endl
+		<< t->tenant_and_id_params_scala()
+		<< ")"
+		<< ": Try[Option["
+		<< t->tableNameSingularCapitalised() << "]]"
+		<< endl
+		<< endl;
+	return ss.str();
+}
+
+void generate_get(Table * t, stringstream & ss, stringstream & ss_trait)
+{
+	ss
+		<< gen_get_signature(t)
+		<< " = Try {" << endl
+		<< "DB readOnly { implicit session =>" << endl;
+	ss_trait
+		<< gen_get_signature(t)
+		<< endl;
+	ss
+		<< "sql\"\"\"" << endl;
+	ss
+		<< "\t\tselect " << endl
+		<< t->all_db_keys()
+		<< endl
+		<< "\t\tfrom " << t->table_name << endl
+		<< "\t\twhere " << endl
+		<< "\t\t" << t->tenant_and_id_where_clause_sql()
+		<< endl;
+	ss
+		<< "\"\"\"" << endl
+        	<< "\t\t.map(rs => fromDB(rs).get)" << endl
+        	<< "\t\t.single()" << endl
+        	<< "\t\t.apply()" << endl
+		<< endl;
+
+	ss
+		<< " // closes readonly session " << endl
+		<< "}"	
+		<< endl;
+	ss
+		<< " // closes fn " << endl
+		<< "}" << endl
+		<< endl ;
+}
+
 void generate_create(Table * t, stringstream & ss, stringstream & ss_trait)
 {
 	ss
@@ -337,6 +391,7 @@ ClassAndTrait generate_dao(Table * t)
 	generate_fromDB(t, ss);
 
 	generate_create(t, ss, ss_trait);
+	generate_get(t, ss, ss_trait);
 	generate_delete(t, ss, ss_trait);
 
 	ss
