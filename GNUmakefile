@@ -9,7 +9,7 @@ CC=g++ -g -O0 -std=c++17
 code_gen.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS) -lstdc++fs
 
-build/driver.o: driver.cpp
+build/driver.o: driver.cpp common_defs.h sql.tab.h
 	$(CC) -std=c++11 -I. -c $< -o $@
 
 build/common_defs.o: common_defs.cpp common_defs.h
