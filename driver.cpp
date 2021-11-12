@@ -518,14 +518,22 @@ string generate_models(Table * t)
 	using std::endl;
 	ss
 		<< "package api." << t->table_name
-		<< ".models" << endl;
+		<< ".models"
+		<< endl
+		<< endl;
 
 
 	ss
-		<< "import awscala.DateTime" << endl
-		<< "import play.api.libs.json.Json" << endl
+		<< "import org.joda.time.DateTime" << endl
+		<< "import play.api.libs.json.{JsValue, Json, Writes}"
 		<< endl
-		;
+		<< endl;
+
+	//ss
+	//	<< "import awscala.DateTime" << endl
+	//	<< "import play.api.libs.json.Json" << endl
+	//	<< endl
+	//	;
 
 	ss
 		<< "case class " << t->classNameModel() << "(" << endl
@@ -536,14 +544,17 @@ string generate_models(Table * t)
 
 	ss
 		<< "object " << t->classNameModel() << "{" << endl
-		<< "\timplicit val writes("
+		<< "\timplicit val writes = new Writes["<< t->classNameModel() << "] {" << endl
+		<< "\t\tdef writes ("
 		<< t->valModel()
 		<< ":"
 		<< t->classNameModel()
 		<< ") : JsValue = {" << endl
-		<< "\tJson.obj(" << endl
+		<< "\t\tJson.obj(" << endl
 		<< t->params_for_model_scala_to_json()
-		<< "\t      )" << endl
+		<< "\t\t      )" << endl
+		<< "\t\t}" << endl
+		<< "\t}" << endl
 		<< "}" << endl
 		<< endl;
 
@@ -551,6 +562,13 @@ string generate_models(Table * t)
 		<< "case class " << t->tableNameSingularCapitalised() << "ForCreate(" << endl
 		<< t->params_scala_without_primary_key()
 		<< ")" << endl
+		<< endl
+		<< endl;
+
+	ss
+		<< "object " << t->tableNameSingularCapitalised() << "ForCreate {" << endl
+		<< "implicit val reads = Json.reads["<< t->tableNameSingularCapitalised() << "ForCreate" << "]" << endl
+		<< "}" << endl
 		<< endl
 		<< endl;
 
