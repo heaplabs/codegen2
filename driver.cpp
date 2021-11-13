@@ -248,6 +248,66 @@ void generate_create(Table * t, stringstream & ss,
 		<< endl ;
 }
 
+string gen_update_signature(Table *t)
+{
+	stringstream ss;
+	ss
+		<< "def" << " "
+		<< t->fnUpdateDAO()
+		<< "("
+		<< endl
+		<< t->model_as_method_param()
+		<< ")"
+		<< ": Try[Option["
+		<< t->model() << "]]"
+		<< endl
+		<< endl;
+	return ss.str();
+}
+
+void generate_update(Table * t,
+		stringstream & ss,
+		stringstream & ss_trait)
+{
+	string update_signature = gen_update_signature(t);
+
+	ss
+		<< update_signature
+		<< " = Try {" << endl
+		<< "DB.autoCommit { implicit session =>"
+		<< endl;
+
+
+	ss
+		<< "sql\"\"\"" << endl
+
+		<< "\t\tupdate  " << t->table_name << endl
+		<< "\t\tSET " << endl
+		<< t->update_values_withou_tenant_and_id_set_clause_sql()
+
+		<< "\t\twhere " << endl
+		<< "\t\t" << t->tenant_and_id_where_clause_update_sql()
+		;
+
+	ss
+		<< "\treturning *;" << endl
+		<< "\t" << "\"\"\"" << endl
+		<< "\t.map(rs => fromDB(rs).get)" << endl
+		<< "\t.single()" << endl
+		<< "\t.apply()" << endl
+		<< endl;
+
+	ss
+		<< " // closes autocommit " << endl
+		<< "}"	
+		<< endl;
+
+	ss
+		<< " // closes fn " << endl
+		<< "}" << endl
+		<< endl;
+}
+
 string gen_delete_signature(Table *t)
 {
 	stringstream ss;
@@ -368,6 +428,7 @@ ClassAndTrait generate_dao(Table * t)
 
 	generate_create(t, ss, ss_trait);
 	generate_get(t, ss, ss_trait);
+	generate_update(t, ss, ss_trait);
 	generate_delete(t, ss, ss_trait);
 
 	ss

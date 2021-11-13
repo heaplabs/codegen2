@@ -382,8 +382,8 @@ struct Table {
 
 		extern map<string, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_recs.size();  ++i) {
-			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
 			ss
 				<< (field_info[i]->isPrimaryKey() ?
 					(tableNameSingular() +
@@ -419,8 +419,8 @@ struct Table {
 
 		extern map<string, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_recs.size();  ++i) {
-			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
 			ss
 				<< (field_info[i]->isPrimaryKey() ?
 					(tableNameSingular() +
@@ -451,12 +451,10 @@ struct Table {
 				filtered_recs.push_back(
 					field_info[i]);
 			}
-
 		}
-
 		for (int i= 0; i < filtered_recs.size();  ++i) {
-			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
 			if (filtered_recs[i]->isPrimaryKey()) {
 				ss << field_name << " = "
 					<< "$" << tableNameSingular()
@@ -473,6 +471,111 @@ struct Table {
 		}
 		return ss.str();
 	}
+
+	string tenant_and_id_where_clause_update_sql() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
+		for (int i= 0; i < field_info.size();  ++i) {
+			// vector<FlagInfo*> flag_info_vec =
+			// 	field_info[i]->flag_info_vec;
+			if (field_info[i]->isPrimaryKey() ||
+				field_info[i]->isTenantKey())
+			{
+				//ss << field_name << " : "
+				//	<< data_type << endl;
+				filtered_recs.push_back(
+					field_info[i]);
+			}
+		}
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
+			if (filtered_recs[i]->isPrimaryKey()) {
+				ss
+					<< field_name << " = "
+					<< "${"
+					<< tableNameSingular()
+					<< "."
+					<< field_name
+					<< "}"
+					<< endl;
+			} else {
+				ss
+					<< field_name << " = "
+					<< "${"
+					<< tableNameSingular()
+					<< "."
+					<< field_name
+					<< "}"
+					<< endl;
+			}
+			if (i != filtered_recs.size() - 1) {
+				ss << " AND ";
+			}
+		}
+		return ss.str();
+	}
+
+	string model_as_method_param()
+	{
+		return valModel()
+			+ " : "
+			+ model();
+	}
+
+	// ========== begin
+
+	string update_values_withou_tenant_and_id_set_clause_sql() {
+		using std::stringstream;
+		using std::endl;
+		stringstream ss;
+		vector<FieldInfo*> filtered_recs;
+		for (int i= 0; i < field_info.size();  ++i) {
+			// vector<FlagInfo*> flag_info_vec =
+			// 	field_info[i]->flag_info_vec;
+			if (!(field_info[i]->isPrimaryKey() ||
+				field_info[i]->isTenantKey()))
+			{
+				//ss << field_name << " : "
+				//	<< data_type << endl;
+				filtered_recs.push_back(
+					field_info[i]);
+			} else {
+				string field_name = field_info[i]->field_name;
+				std::cout << "update_values_withou_tenant_and_id_set_clause_sql: not pushing key: " << field_name  << std::endl;
+			}
+		}
+		std::cout << "filtered_recs.size(): "
+			<< filtered_recs.size()
+			<< ", " 
+			<< " field_info.size(): "
+			<< field_info.size()
+			<< endl;
+
+		for (int i= 0; i < filtered_recs.size();  ++i) {
+			string field_name = filtered_recs[i]->field_name;
+			string data_type = filtered_recs[i]->data_type ;
+
+			ss
+				<< "\t\t"
+				<< field_name
+				<< " = "
+				<< "${"
+				<< valModel()
+				<< "."
+				<< field_name 
+				<< "}"
+				<< endl;
+			if (i != filtered_recs.size() - 1) {
+				ss << " , ";
+			}
+		}
+		return ss.str();
+	}
+
+	// ========= end
 
 
 	string insert_stmt_keys() {
@@ -613,6 +716,11 @@ struct Table {
 
 	string fnCreateDAO() {
 		return string("create") + 
+			tableNameSingularCapitalised();
+	}
+
+	string fnUpdateDAO() {
+		return string("update") + 
 			tableNameSingularCapitalised();
 	}
 
