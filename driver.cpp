@@ -1,5 +1,6 @@
 #include "common_defs.h"
 #include "sql.tab.h"
+#include "graph.h"
 
 extern map<string, Table*> table_details;
 
@@ -83,8 +84,44 @@ void generate_scala_play( const map<string, Table*> & table_details)
 	
 }
 
+Graph build_table_relations_graph(const map<string, Table*> &table_details)
+{
+	map<string, set<string> > table_relations;
+	for (map<string, Table*>::const_iterator ci = table_details.begin();
+		ci != table_details.end(); ++ci) {
+		set<string> deps;
+		Table * t = ci->second;
+		for (int i = 0; i < t->field_info.size(); ++i) {
+			FieldInfo * f = t->field_info[i];
+			for (int j =0; j < f->flag_info_vec.size(); ++j) {
+				FlagInfo * flg_info = f->flag_info_vec[j];
+				if (flg_info->isForeignKey()) {
+					ForeignKey * fk_flag = (ForeignKey*) flg_info;
+					deps.insert(fk_flag->table_name);
+				}
+			}
+		}
+		table_relations[t->table_name] = deps;
+	}
+	cout << "build_table_relations_graph: deps between tables" << endl;
+	for (map<string, set<string> > :: const_iterator ci = table_relations.begin();
+			ci != table_relations.end(); ++ci) {
+		cout << ci->first << ": " ;
+		const set<string> & deps = ci->second;
+		for (set<string>::const_iterator ci = deps.begin();
+			ci != deps.end(); ++ci) {
+			cout << " " << *ci; 
+		}
+		cout << endl;
+	}
+	Graph g(table_relations);
+	return g;
+
+}
+
 void print_table_details( const map<string, Table*> & table_details)
 {
+	cout << "ENTER print_table_details" << endl;
 	for(map<string, Table*>::const_iterator cit =
 		table_details.begin(); cit != table_details.end();
 		++cit) {
@@ -92,11 +129,13 @@ void print_table_details( const map<string, Table*> & table_details)
 			<< cit->second->to_string()
 			<< endl;
 	}
+	cout << "EXIT print_table_details" << endl;
 }
 
 void print_map_details(
 	const map<string, string> & postgres_to_scala_map)
 {
+	cout << "ENTER print_map_details" << endl;
 	for (map<string, string>::const_iterator ci =
 		postgres_to_scala_map.begin();
 		ci != postgres_to_scala_map.end();
@@ -104,6 +143,7 @@ void print_map_details(
 		cout << ci->first << " : " << ci->second
 			<< endl;
 	}
+	cout << "EXIT print_map_details" << endl;
 }
 
 #include <sys/stat.h>
@@ -119,6 +159,7 @@ int main() {
 	}
 
 	print_table_details(table_details);
+	Graph g = build_table_relations_graph(table_details);
 	extern map<string, string> postgres_to_scala_map;
 	print_map_details(postgres_to_scala_map);
 	generate_scala_play(table_details);

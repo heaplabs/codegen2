@@ -22,6 +22,7 @@ struct FlagInfo {
 	virtual bool isPrimaryKey() = 0;
 	virtual bool isTenantKey() = 0;
 	virtual string toString() = 0;
+	virtual bool isForeignKey() = 0;
 };
 
 struct PrimaryKey: public FlagInfo {
@@ -30,6 +31,7 @@ struct PrimaryKey: public FlagInfo {
 	string toString() {
 		return string("PRIMARY KEY" );
 	}
+	bool isForeignKey() { return false; }
 };
 
 struct ForeignKey: public FlagInfo {
@@ -43,6 +45,7 @@ struct ForeignKey: public FlagInfo {
 	string toString() {
 		return string("FOREIGN KEY REFERENCES  " + table_name + "(" + field_name + ")" );
 	}
+	bool isForeignKey() { return true; }
 };
 
 struct TenantId: public FlagInfo {
@@ -52,6 +55,7 @@ struct TenantId: public FlagInfo {
 	string toString() {
 		return string("TENANT_ID ");
 	}
+	bool isForeignKey() { return false; }
 };
 
 struct SearchKey: public FlagInfo {
@@ -61,6 +65,7 @@ struct SearchKey: public FlagInfo {
 	string toString() {
 		return string("SEARCH_KEY ");
 	}
+	bool isForeignKey() { return false; }
 };
 
 
@@ -71,6 +76,7 @@ struct DefaultNow: public FlagInfo {
 	string toString() {
 		return string("DEFAULT now()");
 	}
+	bool isForeignKey() { return false; }
 };
 
 struct NotNull: public FlagInfo {
@@ -80,6 +86,7 @@ struct NotNull: public FlagInfo {
 	string toString() {
 		return string("NOT NULL");
 	}
+	bool isForeignKey() { return false; }
 };
 
 struct UniqueKey: public FlagInfo {
@@ -89,6 +96,7 @@ struct UniqueKey: public FlagInfo {
 	string toString() {
 		return string("UNIQUE");
 	}
+	bool isForeignKey() { return false; }
 };
 
 string capitaliseSingular(string s);

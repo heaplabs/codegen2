@@ -1,6 +1,6 @@
 
 OBJS= build/sql.tab.o build/sql-lex.yy.o build/driver.o \
-      build/common_defs.o
+      build/common_defs.o build/top_sort.o
 SRC=sql.y sql-lex.l
 CC=g++ -g -O0 -std=c++17
 
@@ -26,6 +26,9 @@ sql.tab.h sql.tab.c: sql.y GNUmakefile common_defs.h
 
 sql-lex.yy.c: sql-lex.l common_defs.h
 	flex --backup -o $@ $<
+
+build/top_sort.o: top_sort.cpp graph.h 
+	$(CC) -c $< -o $@
 
 clean:
 	rm build/*.o build/sql.tab.[hc] build/sql-lex.yy.c build/*.exe
