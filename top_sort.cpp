@@ -7,83 +7,82 @@
 #include <deque>
 #include <iostream>
 
+#include "graph.h"
+
 using namespace std;
 
-struct Graph {
-	Graph( map<string, set<string>> p_node_relations):
+Graph::Graph( map<string, set<string>> p_node_relations):
 		node_relations(p_node_relations)
 	{ } 
-	map<string, set<string>> node_relations;
 
-	void topological_sort_aux(
+void Graph::topological_sort_aux(
 			string node,
 			deque<pair<string, int> > & order,
 			map<string, bool> & visited,
 			deque<string> & visit_queue,
 			int nest_level)
-	{
-		cout << "ENTER topological_sort_aux: " 
-			<< " nest_level: " << nest_level << endl;
-		if (nest_level > 20) {
-			return;
-		}
-
-			//string node = visit_queue.front();
-			cout << "INFO topological_sort_aux visit_queue head: " << node
-				<< endl;
-			//visit_queue.pop_front();
-			if (!visited[node]) {
-				set<string>& nodes = node_relations[node];
-				for (set<string>::const_iterator n_it = 
-					nodes.begin(); n_it != nodes.end();
-					++n_it) {
-					if (!visited[*n_it]) {
-						//visit_queue.push_back(*n_it);
-						topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
-						visited[*n_it] = true;
-					}
-				}
-				//topological_sort_aux(order, visited, visit_queue, nest_level+1);
-				cout << "adding node: " << node << " to the topological order" << endl;
-				order.push_back({node, nest_level});
-				visited[node] = true;
-			}
+{
+	cout << "ENTER topological_sort_aux: " 
+		<< " nest_level: " << nest_level << endl;
+	if (nest_level > 20) {
+		return;
 	}
 
-	deque<pair<string, int> > topological_sort() {
-		deque<pair<string, int> >  order;
-		map<string, bool>  visited;
-		deque<string> visit_queue;
-		for ( map<string, set<string> >::const_iterator it = 
-			node_relations.begin(); it != node_relations.end(); ++it ) {
-			visited.insert({it->first, false});
-		}
-		int nest_level = 1;
-		cout << "INFO queue empty - searching for a starting node" << endl;
-		for (map<string, set<string>>::iterator it = 
-			node_relations.begin(); it != node_relations.end();
-			++it) {
-			if (!visited[it->first]) {
-				cout << "processing node: " << it->first << ", nest_level: " << nest_level << endl;
-				set<string>& nodes = it->second;
-				for (set<string>::const_iterator n_it = 
-					nodes.begin(); n_it != nodes.end();
-					++n_it) {
-					if (!visited[*n_it]) {
-						cout << "pushing " << *n_it << " into the queue" << endl;
-						//visit_queue.push_back(*n_it);
-						topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
-						visited[*n_it] = true;
-					}
+		//string node = visit_queue.front();
+		cout << "INFO topological_sort_aux visit_queue head: " << node
+			<< endl;
+		//visit_queue.pop_front();
+		if (!visited[node]) {
+			set<string>& nodes = node_relations[node];
+			for (set<string>::const_iterator n_it = 
+				nodes.begin(); n_it != nodes.end();
+				++n_it) {
+				if (!visited[*n_it]) {
+					//visit_queue.push_back(*n_it);
+					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
+					visited[*n_it] = true;
 				}
-				//topological_sort_aux(order, visited, visit_queue, nest_level+1);
-				order.push_back({it->first, nest_level});
-				visited[it->first] = true;
 			}
+			//topological_sort_aux(order, visited, visit_queue, nest_level+1);
+			cout << "adding node: " << node << " to the topological order" << endl;
+			order.push_back({node, nest_level});
+			visited[node] = true;
 		}
-		return order;
+}
+
+deque<pair<string, int> > Graph::topological_sort() {
+	deque<pair<string, int> >  order;
+	map<string, bool>  visited;
+	deque<string> visit_queue;
+	for ( map<string, set<string> >::const_iterator it = 
+		node_relations.begin(); it != node_relations.end(); ++it ) {
+		visited.insert({it->first, false});
 	}
-};
+	int nest_level = 1;
+	cout << "INFO queue empty - searching for a starting node" << endl;
+	for (map<string, set<string>>::iterator it = 
+		node_relations.begin(); it != node_relations.end();
+		++it) {
+		if (!visited[it->first]) {
+			cout << "processing node: " << it->first << ", nest_level: " << nest_level << endl;
+			set<string>& nodes = it->second;
+			for (set<string>::const_iterator n_it = 
+				nodes.begin(); n_it != nodes.end();
+				++n_it) {
+				if (!visited[*n_it]) {
+					cout << "pushing " << *n_it << " into the queue" << endl;
+					//visit_queue.push_back(*n_it);
+					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
+					visited[*n_it] = true;
+				}
+			}
+			//topological_sort_aux(order, visited, visit_queue, nest_level+1);
+			order.push_back({it->first, nest_level});
+			visited[it->first] = true;
+		}
+	}
+	return order;
+}
 
 int main() {
 	map<string, set<string> > graph;
