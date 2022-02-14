@@ -106,12 +106,25 @@ int main() {
 	integration_deps.insert("differentiation");
 	set<string> continuous_fns_deps;
 	continuous_fns_deps.insert("real_line");
+	set<string> bio1_deps;
+	set<string> chem1_deps;
+	set<string> bio2_deps;
+	bio2_deps.insert("bio1");
+	bio2_deps.insert("chem1");
+	set<string> chem2_deps;
+	chem2_deps.insert("bio1");
+	chem2_deps.insert("chem1");
+
 	graph.insert({"highschool_algebra", highschool_algebra_deps});
 	graph.insert({"highschool_geometry", highschool_geometry_deps});
 	graph.insert({"integration", integration_deps});
 	graph.insert({"differentiation", differentiation_deps});
 	graph.insert({"continuous_fns", continuous_fns_deps});
 	graph.insert({"real_line", real_line_deps});
+	graph.insert({"bio1", bio1_deps});
+	graph.insert({"bio2", bio2_deps});
+	graph.insert({"chem1", chem1_deps});
+	graph.insert({"chem2", chem2_deps});
 	Graph g(graph);
 
 	deque<pair<string, int> >  order = g.topological_sort();
