@@ -21,8 +21,8 @@ int main() {
 	integration_deps.insert("real_line");
 	integration_deps.insert("continuous_fns");
 	set<string> differentiation_deps;
-	integration_deps.insert("real_line");
-	integration_deps.insert("differentiation");
+	differentiation_deps.insert("real_line");
+	differentiation_deps.insert("continuous_fns");
 	set<string> continuous_fns_deps;
 	continuous_fns_deps.insert("real_line");
 	set<string> bio1_deps;

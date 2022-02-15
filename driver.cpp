@@ -160,6 +160,8 @@ int main() {
 
 	print_table_details(table_details);
 	Graph g = build_table_relations_graph(table_details);
+	deque<pair<string, int> >  order = g.topological_sort();
+
 	extern map<string, string> postgres_to_scala_map;
 	print_map_details(postgres_to_scala_map);
 	generate_scala_play(table_details);
