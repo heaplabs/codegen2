@@ -33,6 +33,7 @@ void Graph::topological_sort_aux(
 		<< endl;
 		//visit_queue.pop_front();
 	if (!visited[node]) {
+		visited[node] = true;
 		set<string>& nodes = node_relations[node];
 		for (set<string>::const_iterator n_it = 
 			nodes.begin(); n_it != nodes.end();
@@ -40,13 +41,12 @@ void Graph::topological_sort_aux(
 			if (!visited[*n_it]) {
 				//visit_queue.push_back(*n_it);
 				topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
-				visited[*n_it] = true;
+				//visited[*n_it] = true;
 			}
 		}
 		//topological_sort_aux(order, visited, visit_queue, nest_level+1);
 		cout << "adding node: " << node << " to the topological order" << endl;
 		order.push_back({node, nest_level});
-		visited[node] = true;
 	}
 }
 
@@ -72,9 +72,9 @@ deque<pair<string, int> > Graph::topological_sort() {
 				nodes.begin(); n_it != nodes.end();
 				++n_it) {
 				if (!visited[*n_it]) {
-					cout << "pushing " << *n_it << " into the queue" << endl;
+					cout << "pushing " << *n_it << " onto the stack" << endl;
 					//visit_queue.push_back(*n_it);
-					visited[*n_it] = true;
+					//visited[*n_it] = true;
 					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
 				}
 			}
