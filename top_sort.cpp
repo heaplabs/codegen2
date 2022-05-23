@@ -29,28 +29,29 @@ void Graph::topological_sort_aux(
 	}
 
 		//string node = visit_queue.front();
-		cout << "INFO topological_sort_aux visit_queue head: " << node
-			<< endl;
+	cout << "INFO topological_sort_aux visit_queue head: " << node
+		<< endl;
 		//visit_queue.pop_front();
-		if (!visited[node]) {
-			set<string>& nodes = node_relations[node];
-			for (set<string>::const_iterator n_it = 
-				nodes.begin(); n_it != nodes.end();
-				++n_it) {
-				if (!visited[*n_it]) {
-					//visit_queue.push_back(*n_it);
-					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
-					visited[*n_it] = true;
-				}
+	if (!visited[node]) {
+		set<string>& nodes = node_relations[node];
+		for (set<string>::const_iterator n_it = 
+			nodes.begin(); n_it != nodes.end();
+			++n_it) {
+			if (!visited[*n_it]) {
+				//visit_queue.push_back(*n_it);
+				topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
+				visited[*n_it] = true;
 			}
-			//topological_sort_aux(order, visited, visit_queue, nest_level+1);
-			cout << "adding node: " << node << " to the topological order" << endl;
-			order.push_back({node, nest_level});
-			visited[node] = true;
 		}
+		//topological_sort_aux(order, visited, visit_queue, nest_level+1);
+		cout << "adding node: " << node << " to the topological order" << endl;
+		order.push_back({node, nest_level});
+		visited[node] = true;
+	}
 }
 
 deque<pair<string, int> > Graph::topological_sort() {
+	cout << "ENTER " << __PRETTY_FUNCTION__ << endl;
 	deque<pair<string, int> >  order;
 	map<string, bool>  visited;
 	deque<string> visit_queue;
@@ -64,6 +65,7 @@ deque<pair<string, int> > Graph::topological_sort() {
 		node_relations.begin(); it != node_relations.end();
 		++it) {
 		if (!visited[it->first]) {
+			visited[it->first] = true;
 			cout << "processing node: " << it->first << ", nest_level: " << nest_level << endl;
 			set<string>& nodes = it->second;
 			for (set<string>::const_iterator n_it = 
@@ -72,13 +74,13 @@ deque<pair<string, int> > Graph::topological_sort() {
 				if (!visited[*n_it]) {
 					cout << "pushing " << *n_it << " into the queue" << endl;
 					//visit_queue.push_back(*n_it);
-					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
 					visited[*n_it] = true;
+					topological_sort_aux(*n_it, order, visited, visit_queue, nest_level+1);
 				}
 			}
 			//topological_sort_aux(order, visited, visit_queue, nest_level+1);
 			order.push_back({it->first, nest_level});
-			visited[it->first] = true;
+			//visited[it->first] = true;
 		}
 	}
 	return order;

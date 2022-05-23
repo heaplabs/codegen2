@@ -103,7 +103,7 @@ Graph build_table_relations_graph(const map<string, Table*> &table_details)
 		}
 		table_relations[t->table_name] = deps;
 	}
-	cout << "build_table_relations_graph: deps between tables" << endl;
+	cout << "BEGIN build_table_relations_graph: deps between tables" << endl;
 	for (map<string, set<string> > :: const_iterator ci = table_relations.begin();
 			ci != table_relations.end(); ++ci) {
 		cout << ci->first << ": " ;
@@ -114,6 +114,7 @@ Graph build_table_relations_graph(const map<string, Table*> &table_details)
 		}
 		cout << endl;
 	}
+	cout << "END build_table_relations_graph: deps between tables" << endl;
 	Graph g(table_relations);
 	return g;
 
@@ -161,6 +162,14 @@ int main() {
 	print_table_details(table_details);
 	Graph g = build_table_relations_graph(table_details);
 	deque<pair<string, int> >  order = g.topological_sort();
+	cout << " TOPOLOGICAL ORDERING for tables is : " << endl;
+	for (int i = 0; i < order.size(); ++i) {
+		cout
+			<< "tab: " << order[i].first
+			<< ", ord: " << i 
+			<< endl;
+	}
+	cout << " END  TOPOLOGICAL ORDERING  " << endl;
 
 	extern map<string, string> postgres_to_scala_map;
 	print_map_details(postgres_to_scala_map);

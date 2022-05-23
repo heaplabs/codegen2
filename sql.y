@@ -52,6 +52,7 @@ create_stmt: CREATE TABLE identifier '('
 			<< "field_info_vec sz: "
 			<< field_info_vec.size()
 			<< endl;
+		field_info_vec.resize(0);
 	}
 	;
 
