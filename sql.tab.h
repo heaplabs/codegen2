@@ -83,7 +83,16 @@ extern int yydebug;
     SCHEMA = 289,
     ALTER = 290,
     TO = 291,
-    OWNER = 292
+    OWNER = 292,
+    SEQUENCE = 293,
+    START = 294,
+    INCREMENT = 295,
+    BY = 296,
+    NO = 297,
+    MINVALUE = 298,
+    MAXVALUE = 299,
+    CACHE = 300,
+    OWNED = 301
   };
 #endif
 
@@ -100,7 +109,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 104 "sql.tab.h"
+#line 113 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

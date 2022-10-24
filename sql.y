@@ -48,6 +48,7 @@
 %token WARNING
 %token SCHEMA
 %token ALTER TO OWNER
+%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED
 
 
 %%
@@ -61,6 +62,21 @@ stmt: create_table_stmt
 	| set_stmt
 	| create_schema_stmt
 	| alter_schema_stmt
+	| alter_table_stmt
+	| create_seq_stmt 
+	;
+
+alter_seq_stmt:
+	ALTER SEQUENCE identifier '.' identifier OWNED BY identifier '.' identifier '.' identifier ';'
+	;
+
+create_seq_stmt : 
+	CREATE SEQUENCE identifier '.' identifier 
+	START WITH number
+	INCREMENT BY number
+	NO MINVALUE
+	NO MAXVALUE
+	CACHE number ';'
 	;
 
 	// we are going to discard the create schema for now
@@ -68,8 +84,14 @@ create_schema_stmt :
 	CREATE SCHEMA identifier ';'
 	;
 
+	// we are going to discard these alter schema  statements 
 alter_schema_stmt:
 	ALTER SCHEMA identifier OWNER TO identifier ';'
+	;
+
+
+alter_table_stmt:
+	ALTER TABLE identifier '.' identifier OWNER TO identifier ';'
 	;
 
 	// we are going to discard these set statements 

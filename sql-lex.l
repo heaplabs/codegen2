@@ -30,9 +30,47 @@ OWNER {
 	return OWNER;
 }
 
+OWNED {
+	return OWNED;
+}
+
 TO {
 	return TO;
 }
+
+SEQUENCE {
+	return SEQUENCE;
+}
+
+START {
+	return START;
+}
+
+INCREMENT {
+	return INCREMENT;
+}
+
+BY {
+	return BY;
+}
+
+NO {
+	return NO;
+}
+
+MINVALUE {
+	return MINVALUE;
+}
+
+
+MAXVALUE {
+	return MAXVALUE;
+}
+
+CACHE {
+	return CACHE;
+}
+
 
 [bB][iI][gG][iI][nN][tT] {
 	return BIGINT;
