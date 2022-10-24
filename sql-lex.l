@@ -16,6 +16,41 @@
 	return TABLE;
 }
 
+[bB][iI][gG][iI][nN][tT] {
+	return BIGINT;
+}
+
+[tT][eE][Xx][Tt] {
+	return TEXT;
+}
+
+
+[tT][iI][mM][eE][sS][tT][aA][mM][pP] {
+
+	return TIMESTAMP;
+}
+
+[wW][iI][tT][hH] {
+	return WITH;
+}
+
+[tT][iI][mM][eE] {
+	return TIME;
+}
+
+
+[zZ][oO][Nn][eE] {
+	return ZONE;
+}
+
+[iI][nN][tT][eE][gG][eE][rR] {
+	return INTEGER;
+}
+
+[bB][oO][oO][Ll][eE][aA][nN] {
+	return BOOLEAN;
+}
+
 PRIMARY {
 	return PRIMARY;
 }

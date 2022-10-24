@@ -49,25 +49,32 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    table_name = 258,
-    identifier = 259,
-    CREATE = 260,
-    TABLE = 261,
-    PRIMARY = 262,
-    KEY = 263,
-    FOREIGN = 264,
-    REFERENCES = 265,
-    SEARCH_KEY = 266,
-    TENANT_ID = 267,
-    now = 268,
-    DEFAULT = 269,
-    NOT = 270,
-    NULLL = 271,
-    UNIQUE = 272,
-    MAP = 273,
-    PostgresToScala = 274,
-    SCALA_DATATYPE = 275,
-    DB_CONV = 276
+    identifier = 258,
+    CREATE = 259,
+    TABLE = 260,
+    BIGINT = 261,
+    TEXT = 262,
+    TIMESTAMP = 263,
+    WITH = 264,
+    TIME = 265,
+    ZONE = 266,
+    INTEGER = 267,
+    BOOLEAN = 268,
+    PRIMARY = 269,
+    KEY = 270,
+    FOREIGN = 271,
+    REFERENCES = 272,
+    SEARCH_KEY = 273,
+    TENANT_ID = 274,
+    now = 275,
+    DEFAULT = 276,
+    NOT = 277,
+    NULLL = 278,
+    UNIQUE = 279,
+    MAP = 280,
+    PostgresToScala = 281,
+    SCALA_DATATYPE = 282,
+    DB_CONV = 283
   };
 #endif
 
@@ -75,14 +82,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
+#line 18 "sql.y"
 
-  /* create_stmt  */
-  Table* create_stmt;
-  /* table_name  */
-  std::string* table_name;
-  /* identifier  */
-  std::string* identifier;
-#line 86 "sql.tab.h"
+	struct Table * table;
+	DataType datatype;
+	string* identifier;
+
+#line 92 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

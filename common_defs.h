@@ -99,21 +99,26 @@ struct UniqueKey: public FlagInfo {
 	bool isForeignKey() { return false; }
 };
 
+
+enum DataType {
+	bigint, text, boolean, integer, date_time_with_timez
+};
+
 string capitaliseSingular(string s);
 string capitalise(string s) ;
 string singular(string s) ;
 
 struct FieldInfo {
 	string field_name;
-	string data_type;
+	DataType data_type;
 	vector<FlagInfo*> flag_info_vec;
-	FieldInfo(string f_name, string d_type,
+	FieldInfo(string f_name, DataType d_type,
 		vector<FlagInfo*> flag_info_v
 		):
 		field_name(f_name), data_type(d_type),
 		flag_info_vec(flag_info_v)
 	{ }
-	FieldInfo(string f_name, string d_type
+	FieldInfo(string f_name, DataType d_type
 		):
 		field_name(f_name), data_type(d_type),
 		flag_info_vec()
@@ -266,7 +271,7 @@ struct Table {
 		using std::endl;
 		using std::cout;
 		//extern map<string, string> postgres_to_scala_map;
-		extern map<string, string> postgres_to_db_conv_map;
+		extern map<DataType, string> postgres_to_db_conv_map;
 		//cout << "ENTER wrapped_result_to_classtype_scala"
 		//	<< endl;
 		stringstream ss;
@@ -274,7 +279,7 @@ struct Table {
 		//	<< endl;
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			DataType data_type = field_info[i]->data_type ;
 			ss << field_name << " = "
 				<< " rs ."
 				<< postgres_to_db_conv_map[data_type]
@@ -302,10 +307,10 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
-		extern map<string, string> postgres_to_scala_map;
+		extern map<DataType, string> postgres_to_scala_map;
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			DataType data_type = field_info[i]->data_type ;
 			ss << field_name << " : "
 				<< postgres_to_scala_map[data_type]
 				<< endl;
@@ -320,10 +325,10 @@ struct Table {
 		using std::stringstream;
 		using std::endl;
 		stringstream ss;
-		extern map<string, string> postgres_to_scala_map;
+		extern map<DataType, string> postgres_to_scala_map;
 		for (int i= 0; i < field_info.size();  ++i) {
 			string field_name = field_info[i]->field_name;
-			string data_type = field_info[i]->data_type ;
+			DataType data_type = field_info[i]->data_type ;
 			ss
 				<< "\t\t\""
 				<< field_name
@@ -355,10 +360,10 @@ struct Table {
 					push_back(field_info[i]);
 			}
 		}
-		extern map<string, string> postgres_to_scala_map;
+		extern map<DataType, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_rows.size();  ++i) {
 			string field_name = filtered_rows[i]->field_name;
-			string data_type = filtered_rows[i]->data_type ;
+			DataType data_type = filtered_rows[i]->data_type ;
 			ss << field_name << " : "
 				<< postgres_to_scala_map[data_type]
 				<< endl;
@@ -388,10 +393,10 @@ struct Table {
 
 		}
 
-		extern map<string, string> postgres_to_scala_map;
+		extern map<DataType, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			ss
 				<< (field_info[i]->isPrimaryKey() ?
 					(tableNameSingular() +
@@ -425,10 +430,10 @@ struct Table {
 
 		}
 
-		extern map<string, string> postgres_to_scala_map;
+		extern map<DataType, string> postgres_to_scala_map;
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			ss
 				<< (field_info[i]->isPrimaryKey() ?
 					(tableNameSingular() +
@@ -462,7 +467,7 @@ struct Table {
 		}
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			if (filtered_recs[i]->isPrimaryKey()) {
 				ss << field_name << " = "
 					<< "$" << tableNameSingular()
@@ -499,7 +504,7 @@ struct Table {
 		}
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			if (filtered_recs[i]->isPrimaryKey()) {
 				ss
 					<< field_name << " = "
@@ -564,7 +569,7 @@ struct Table {
 
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 
 			ss
 				<< "\t\t"
@@ -606,7 +611,7 @@ struct Table {
 		}
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			ss << "\t\t\t" << field_name ;
 			if (i != filtered_recs.size() - 1) {
 				ss << ",";
@@ -626,7 +631,7 @@ struct Table {
 		}
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			ss << "\t\t\t" << field_name ;
 			if (i != filtered_recs.size() - 1) {
 				ss << ",";
@@ -658,7 +663,7 @@ struct Table {
 		}
 		for (int i= 0; i < filtered_recs.size();  ++i) {
 			string field_name = filtered_recs[i]->field_name;
-			string data_type = filtered_recs[i]->data_type ;
+			DataType data_type = filtered_recs[i]->data_type ;
 			ss << "\t\t\t${"
 				<< valModelForCreate()
 				<< "."
