@@ -30,7 +30,7 @@
 %define lr.type ielr
 //%token <std::string*> table_name identifier
 //%token <datatype> datatype
-%nterm <table>  create_stmt
+%nterm <table>  create_table_stmt
 %nterm <datatype>  datatype
 //%nterm <DataType*>  data_type
 %token <identifier> identifier
@@ -44,6 +44,8 @@
 %token now DEFAULT NOT NULLL UNIQUE
 %token MAP PostgresToScala
 %token SCALA_DATATYPE DB_CONV
+%token SET
+%token WARNING
 
 
 %%
@@ -52,11 +54,20 @@ stmts: stmt
      | stmts stmt
      ;
 
-stmt: create_stmt
+stmt: create_table_stmt
 	//| map_types_stmt
+	| set_stmt
 	;
 
-create_stmt: 
+	// we are going to discard these set statements 
+set_stmt: 
+	  SET identifier '=' number ';'
+	| SET identifier '=' TEXT_VAL ';'
+	| SET identifier '=' BBOOLEAN ';'
+	| SET identifier '=' WARNING ';'
+	;
+
+create_table_stmt: 
 	CREATE TABLE identifier '(' field_defns ')' ';' {
 		string * id = $3;
 		string table_name(*id);

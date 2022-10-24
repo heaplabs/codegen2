@@ -159,6 +159,10 @@ false {
 	return number;
 }
 
+SET {
+	return SET;
+}
+
 --.*\n {
 	// ignore comment, but track the line number
 	++n_lines;
@@ -168,6 +172,16 @@ false {
 	string * id = new string(yytext);
 	yylval.text_val = id;
 	return TEXT_VAL;
+}
+
+"'"[a-zA-Z_][_a-zA-Z0-9]*"'" {
+	string * id = new string(yytext);
+	yylval.text_val = id;
+	return TEXT_VAL;
+}
+
+warning {
+	return WARNING;
 }
 
 [a-zA-Z_][_a-zA-Z0-9]* {

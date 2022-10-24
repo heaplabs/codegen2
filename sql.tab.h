@@ -77,7 +77,9 @@ extern int yydebug;
     MAP = 283,
     PostgresToScala = 284,
     SCALA_DATATYPE = 285,
-    DB_CONV = 286
+    DB_CONV = 286,
+    SET = 287,
+    WARNING = 288
   };
 #endif
 
@@ -94,7 +96,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 98 "sql.tab.h"
+#line 100 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
