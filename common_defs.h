@@ -69,6 +69,39 @@ struct SearchKey: public FlagInfo {
 };
 
 
+struct DefaultNumber: public FlagInfo {
+	int data;
+	DefaultNumber(int p_data): data(p_data)
+	{ }
+	bool isPrimaryKey() { return false; }
+	bool isTenantKey() { return false; }
+	string toString() {
+		std::stringstream ss;
+		ss << "DEFAULT " << data;
+		return ss.str();
+	}
+	bool isForeignKey() { return false; }
+};
+
+struct DefaultBoolean: public FlagInfo {
+	bool data;
+	DefaultBoolean(bool p_data): data(p_data)
+	{ }
+	bool isPrimaryKey() { return false; }
+	bool isTenantKey() { return false; }
+	string toString() {
+		std::stringstream ss;
+		ss << "DEFAULT " ;
+		if (data) {
+			ss << "true";
+		} else {
+			ss << "false";
+		}
+		return ss.str();
+	}
+	bool isForeignKey() { return false; }
+};
+
 struct DefaultNow: public FlagInfo {
 	DefaultNow() {}
 	bool isPrimaryKey() { return false; }

@@ -50,31 +50,34 @@ extern int yydebug;
   enum yytokentype
   {
     identifier = 258,
-    CREATE = 259,
-    TABLE = 260,
-    BIGINT = 261,
-    TEXT = 262,
-    TIMESTAMP = 263,
-    WITH = 264,
-    TIME = 265,
-    ZONE = 266,
-    INTEGER = 267,
-    BOOLEAN = 268,
-    PRIMARY = 269,
-    KEY = 270,
-    FOREIGN = 271,
-    REFERENCES = 272,
-    SEARCH_KEY = 273,
-    TENANT_ID = 274,
-    now = 275,
-    DEFAULT = 276,
-    NOT = 277,
-    NULLL = 278,
-    UNIQUE = 279,
-    MAP = 280,
-    PostgresToScala = 281,
-    SCALA_DATATYPE = 282,
-    DB_CONV = 283
+    number = 259,
+    BBOOLEAN = 260,
+    TEXT_VAL = 261,
+    CREATE = 262,
+    TABLE = 263,
+    BIGINT = 264,
+    TEXT = 265,
+    TIMESTAMP = 266,
+    WITH = 267,
+    TIME = 268,
+    ZONE = 269,
+    INTEGER = 270,
+    BOOLEAN = 271,
+    PRIMARY = 272,
+    KEY = 273,
+    FOREIGN = 274,
+    REFERENCES = 275,
+    SEARCH_KEY = 276,
+    TENANT_ID = 277,
+    now = 278,
+    DEFAULT = 279,
+    NOT = 280,
+    NULLL = 281,
+    UNIQUE = 282,
+    MAP = 283,
+    PostgresToScala = 284,
+    SCALA_DATATYPE = 285,
+    DB_CONV = 286
   };
 #endif
 
@@ -87,8 +90,11 @@ union YYSTYPE
 	struct Table * table;
 	DataType datatype;
 	string* identifier;
+	int number;
+	bool bboolean;
+	string * text_val;
 
-#line 92 "sql.tab.h"
+#line 98 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

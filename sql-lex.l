@@ -1,6 +1,7 @@
 %{
 #include "common_defs.h"
 #include "sql.tab.h"
+int n_lines = 1;
 %}
 
 %option noyywrap 8bit
@@ -85,6 +86,7 @@ NULL {
 }
 
 DEFAULT {
+	std::cout << "returning DEFAULT: " << std::endl;
 	return DEFAULT;
 }
 
@@ -119,6 +121,50 @@ PostgresToScala {
 
 \r\n|\n\r|\r|\n {
 	// discard newlines - we'll count them later
+	++n_lines;
+}
+
+true {
+	string s(yytext); 
+	if (s == "true") {
+		yylval.bboolean = true;
+	} else {
+		yylval.bboolean = false;
+	}
+	std::cout << "returning bboolean: " << yylval.bboolean << std::endl;
+	return BBOOLEAN;
+}
+
+false {
+	string s(yytext); 
+	if (s == "true") {
+		yylval.bboolean = true;
+	} else {
+		yylval.bboolean = false;
+	}
+	std::cout << "returning bboolean: " << yylval.bboolean << std::endl;
+	return BBOOLEAN;
+}
+
+	/*
+	false {
+		yylval.boolean = false;
+		return boolean;
+	}
+	*/
+
+[0-9]* {
+	string num_str (yytext);
+	yylval.number = atoi(num_str.c_str());
+	return number;
+}
+
+
+
+"'"[a-zA-Z_][_a-zA-Z0-9]*"'"::text {
+	string * id = new string(yytext);
+	yylval.text_val = id;
+	return TEXT_VAL;
 }
 
 [a-zA-Z_][_a-zA-Z0-9]* {

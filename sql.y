@@ -19,6 +19,9 @@
 	struct Table * table;
 	DataType datatype;
 	string* identifier;
+	int number;
+	bool bboolean;
+	string * text_val;
 }
 
 //%define api.value.type union
@@ -30,7 +33,10 @@
 %nterm <table>  create_stmt
 %nterm <datatype>  datatype
 //%nterm <DataType*>  data_type
-%token <identifier>identifier
+%token <identifier> identifier
+%token <number> number
+%token <bboolean> BBOOLEAN
+%token <text_val> TEXT_VAL
 
 %token CREATE TABLE '(' ')' ';' 
 %token BIGINT TEXT TIMESTAMP WITH TIME ZONE INTEGER BOOLEAN
@@ -113,12 +119,14 @@ field_defns:
 field_defn:
 	identifier datatype {
 	  	string f_name = *$1;
+		cout << "parsing " << f_name << " without flags " << endl;
 	  	//string f_type = *$2;
 		FieldInfo * a_field = new FieldInfo(f_name, $2);
 		field_info_vec.push_back(a_field);
 	}
 	| identifier datatype  flags {
 	  	string f_name = *$1;
+		cout << "parsing " << f_name << " with flags " << endl;
 	  	//string f_type = *$2;
 		FieldInfo * a_field = new FieldInfo(
 			f_name, $2, flag_info_vec);
@@ -156,7 +164,16 @@ flag:
 	| SEARCH_KEY {
 		flag_info_vec.push_back(new SearchKey());
 	}
+	| DEFAULT BBOOLEAN  {
+		flag_info_vec.push_back(new DefaultBoolean($2));
+	}
+	| DEFAULT number  {
+		flag_info_vec.push_back(new DefaultNumber($2));
+	}
 	| DEFAULT now '(' ')' {
+		flag_info_vec.push_back(new DefaultNow());
+	}
+	| DEFAULT TEXT_VAL   {
 		flag_info_vec.push_back(new DefaultNow());
 	}
 	| NOT NULLL {

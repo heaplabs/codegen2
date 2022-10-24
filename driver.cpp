@@ -6,10 +6,15 @@ extern map<string, Table*> table_details;
 
 #include <iostream>
 
+extern int n_lines;
+
 using namespace std;
 void yyerror(char const * err)
 {
-	cout << "error while parsing: " << err << endl;
+	cout << "error while parsing: " 
+		<< err 
+		<< ", n_lines: " << n_lines
+		<< endl;
 }
 
 
@@ -159,21 +164,21 @@ int main() {
 		exit(2);
 	}
 
-	print_table_details(table_details);
-	Graph g = build_table_relations_graph(table_details);
-	deque<pair<string, int> >  order = g.topological_sort();
-	cout << " TOPOLOGICAL ORDERING for tables is : " << endl;
-	for (int i = 0; i < order.size(); ++i) {
-		cout
-			<< "tab: " << order[i].first
-			<< ", ord: " << i 
-			<< endl;
-	}
-	cout << " END  TOPOLOGICAL ORDERING  " << endl;
+	// print_table_details(table_details);
+	// Graph g = build_table_relations_graph(table_details);
+	// deque<pair<string, int> >  order = g.topological_sort();
+	// cout << " TOPOLOGICAL ORDERING for tables is : " << endl;
+	// for (int i = 0; i < order.size(); ++i) {
+	// 	cout
+	// 		<< "tab: " << order[i].first
+	// 		<< ", ord: " << i 
+	// 		<< endl;
+	// }
+	// cout << " END  TOPOLOGICAL ORDERING  " << endl;
 
-	extern map<string, string> postgres_to_scala_map;
-	print_map_details(postgres_to_scala_map);
-	generate_scala_play(table_details);
+	// extern map<string, string> postgres_to_scala_map;
+	// print_map_details(postgres_to_scala_map);
+	// generate_scala_play(table_details);
 }
 
 void generate_fromDB(Table * t, stringstream & ss)
