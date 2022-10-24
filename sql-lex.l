@@ -17,6 +17,23 @@ int n_lines = 1;
 	return TABLE;
 }
 
+SCHEMA {
+	return SCHEMA;
+}
+
+ALTER {
+	return ALTER;
+}
+
+
+OWNER {
+	return OWNER;
+}
+
+TO {
+	return TO;
+}
+
 [bB][iI][gG][iI][nN][tT] {
 	return BIGINT;
 }

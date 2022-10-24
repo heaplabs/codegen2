@@ -79,7 +79,11 @@ extern int yydebug;
     SCALA_DATATYPE = 285,
     DB_CONV = 286,
     SET = 287,
-    WARNING = 288
+    WARNING = 288,
+    SCHEMA = 289,
+    ALTER = 290,
+    TO = 291,
+    OWNER = 292
   };
 #endif
 
@@ -96,7 +100,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 100 "sql.tab.h"
+#line 104 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

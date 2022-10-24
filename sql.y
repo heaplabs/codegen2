@@ -46,6 +46,8 @@
 %token SCALA_DATATYPE DB_CONV
 %token SET
 %token WARNING
+%token SCHEMA
+%token ALTER TO OWNER
 
 
 %%
@@ -57,6 +59,17 @@ stmts: stmt
 stmt: create_table_stmt
 	//| map_types_stmt
 	| set_stmt
+	| create_schema_stmt
+	| alter_schema_stmt
+	;
+
+	// we are going to discard the create schema for now
+create_schema_stmt :
+	CREATE SCHEMA identifier ';'
+	;
+
+alter_schema_stmt:
+	ALTER SCHEMA identifier OWNER TO identifier ';'
 	;
 
 	// we are going to discard these set statements 
