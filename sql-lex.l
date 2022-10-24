@@ -159,7 +159,10 @@ false {
 	return number;
 }
 
-
+--.*\n {
+	// ignore comment, but track the line number
+	++n_lines;
+}
 
 "'"[a-zA-Z_][_a-zA-Z0-9]*"'"::text {
 	string * id = new string(yytext);
