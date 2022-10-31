@@ -41,7 +41,7 @@
 %token <bboolean> OFF
 
 %token CREATE TABLE '(' ')' ';' 
-%token BIGINT TEXT TIMESTAMP WITH TIME ZONE INTEGER BOOLEAN
+%token BIGINT TEXT TIMESTAMP WITH WITHOUT TIME ZONE INTEGER BOOLEAN
 %token PRIMARY KEY FOREIGN REFERENCES SEARCH_KEY TENANT_ID 
 %token now DEFAULT NOT NULLL UNIQUE
 %token MAP PostgresToScala
@@ -53,7 +53,10 @@
 %token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE HEAP CONSTRAINT CHECK NE LSQB RSQB
 %token CHARACTER VARYING
 %token JSONB CAST_TO_JSONB
-%token EMPTY_JSON
+%token EMPTY_JSON AS
+%token DOUBLE PRECISION
+%token ONLY COLUMN NEXTVAL CAST_TO_REG_CLASS
+%token UNIQUE ADD
 
 
 %%
@@ -83,6 +86,13 @@ create_seq_stmt :
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE number ';'
+	| CREATE SEQUENCE identifier '.' identifier 
+	  AS datatype
+	  START WITH number
+	  INCREMENT BY number
+	  NO MINVALUE
+	  NO MAXVALUE
+	  CACHE number ';'
 	;
 
 	// we are going to discard the create schema for now
@@ -98,6 +108,9 @@ alter_schema_stmt:
 
 alter_table_stmt:
 	ALTER TABLE identifier '.' identifier OWNER TO identifier ';'
+	| ALTER TABLE ONLY identifier '.' identifier ALTER COLUMN identifier SET DEFAULT NEXTVAL '(' CAST_TO_REG_CLASS ')' ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE expr ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY expr ';'
 	;
 
 	// we are going to discard these set statements 
@@ -217,11 +230,13 @@ expr :
 datatype : BIGINT  //{ $$ = DataType.bigint }
 	 | TEXT //{ $$ = DataType.text } 
 	 | TIMESTAMP WITH TIME ZONE //{ $$ = DataType.date_time_with_timez }
+	 | TIMESTAMP WITHOUT TIME ZONE //{ $$ = DataType.date_time_with_timez }
 	 | INTEGER //{ $$ = DataType.integer }
 	 | BOOLEAN //{ $$ = DataType.boolean }
 	 | CHARACTER VARYING
 	 | CHARACTER VARYING '(' number ')'
 	 | JSONB
+	 | DOUBLE PRECISION
 	 ;
 
 flags:

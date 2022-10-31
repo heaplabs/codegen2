@@ -94,6 +94,15 @@ jsonb {
 	return WITH;
 }
 
+AS {
+	return AS;
+}
+
+
+without {
+	return WITHOUT;
+}
+
 [tT][iI][mM][eE] {
 	return TIME;
 }
@@ -105,6 +114,27 @@ jsonb {
 
 [iI][nN][tT][eE][gG][eE][rR] {
 	return INTEGER;
+}
+
+double {
+	return DOUBLE;
+}
+
+precision {
+	return PRECISION;
+}
+
+ONLY {
+	std::cout << "return ONLY " << std::endl;
+	return ONLY;
+}
+
+COLUMN {
+	return COLUMN;
+}
+
+nextval {
+	return NEXTVAL;
 }
 
 [bB][oO][oO][Ll][eE][aA][nN] {
@@ -237,6 +267,14 @@ character {
 	return CHARACTER;
 }
 
+UNIQUE {
+	return UNIQUE;
+}
+
+ADD {
+	return ADD;
+}
+
 varying {
 	return VARYING;
 }
@@ -289,6 +327,12 @@ SET {
 }
 
 
+"'"[a-zA-Z_][_a-zA-Z0-9]*"\."[a-zA-Z_][_a-zA-Z0-9]*"'"::regclass {
+	string * id = new string(yytext);
+	yylval.text_val = id;
+	return CAST_TO_REG_CLASS;
+}
+
 "'"[a-zA-Z_][_a-zA-Z0-9]*"'"::text {
 	string * id = new string(yytext);
 	yylval.text_val = id;
@@ -307,6 +351,10 @@ SET {
 	return TEXT_VAL;
 }
 
+column {
+	return COLUMN;
+}
+
 
 warning {
 	return WARNING;
@@ -315,6 +363,7 @@ warning {
 [a-zA-Z_][_a-zA-Z0-9]* {
 	string * id = new string(yytext);
 	yylval.identifier = id;
+	std::cout << "return identifier: " << *id << std::endl;
 	return identifier;
 }
 
