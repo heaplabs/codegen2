@@ -50,7 +50,7 @@
 %token WARNING
 %token SCHEMA
 %token ALTER TO OWNER
-%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE
+%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE HEAP CONSTRAINT CHECK NE LSQB RSQB
 
 
 %%
@@ -66,6 +66,7 @@ stmt: create_table_stmt
 	| alter_schema_stmt
 	| alter_table_stmt
 	| create_seq_stmt 
+	| alter_seq_stmt
 	;
 
 alter_seq_stmt:
@@ -103,6 +104,7 @@ set_stmt:
 	| SET identifier '=' BBOOLEAN ';'
 	| SET identifier '=' WARNING ';'
 	| SET identifier '=' QUOTE QUOTE';'
+	| SET identifier '=' HEAP ';'
 	;
 
 create_table_stmt: 
@@ -182,7 +184,23 @@ field_defn:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
+	| identifier datatype LSQB RSQB  flags {
+	  	string f_name = *$1;
+		cout << "parsing " << f_name << " with flags " << endl;
+	  	//string f_type = *$2;
+		FieldInfo * a_field = new FieldInfo(
+			f_name, $2, flag_info_vec);
+		field_info_vec.push_back(a_field);
+		flag_info_vec.resize(0);
+	}
+	| CONSTRAINT identifier CHECK expr
 	;
+
+expr :
+     	expr NE expr
+     |  '(' expr ')'
+     |  identifier
+     ;
 
 datatype : BIGINT  //{ $$ = DataType.bigint }
 	 | TEXT //{ $$ = DataType.text } 

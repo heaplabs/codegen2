@@ -95,7 +95,13 @@ extern int yydebug;
     MAXVALUE = 301,
     CACHE = 302,
     OWNED = 303,
-    QUOTE = 304
+    QUOTE = 304,
+    HEAP = 305,
+    CONSTRAINT = 306,
+    CHECK = 307,
+    NE = 308,
+    LSQB = 309,
+    RSQB = 310
   };
 #endif
 
@@ -112,7 +118,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 116 "sql.tab.h"
+#line 122 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

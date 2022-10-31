@@ -206,6 +206,10 @@ content {
 	return TEXT_VAL;
 }
 
+heap {
+	return HEAP;
+}
+
 false {
 	string s(yytext); 
 	if (s == "true") {
@@ -215,6 +219,18 @@ false {
 	}
 	std::cout << "returning bboolean: " << yylval.bboolean << std::endl;
 	return BBOOLEAN;
+}
+
+CONSTRAINT {
+	return CONSTRAINT;
+}
+
+CHECK {
+	return CHECK;
+}
+
+"<>" {
+	return NE;
 }
 
 	/*
@@ -233,6 +249,15 @@ false {
 SET {
 	return SET;
 }
+
+"[" {
+	return LSQB;
+}
+
+"]" {
+	return RSQB;
+}
+
 
 --.*\n {
 	// ignore comment, but track the line number
