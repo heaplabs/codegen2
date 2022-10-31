@@ -101,7 +101,12 @@ extern int yydebug;
     CHECK = 307,
     NE = 308,
     LSQB = 309,
-    RSQB = 310
+    RSQB = 310,
+    CHARACTER = 311,
+    VARYING = 312,
+    JSONB = 313,
+    CAST_TO_JSONB = 314,
+    EMPTY_JSON = 315
   };
 #endif
 
@@ -118,7 +123,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 122 "sql.tab.h"
+#line 127 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

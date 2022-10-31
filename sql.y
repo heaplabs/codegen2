@@ -51,6 +51,9 @@
 %token SCHEMA
 %token ALTER TO OWNER
 %token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE HEAP CONSTRAINT CHECK NE LSQB RSQB
+%token CHARACTER VARYING
+%token JSONB CAST_TO_JSONB
+%token EMPTY_JSON
 
 
 %%
@@ -184,6 +187,15 @@ field_defn:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
+	| identifier datatype LSQB RSQB  {
+	  	string f_name = *$1;
+		cout << "parsing " << f_name << " with flags " << endl;
+	  	//string f_type = *$2;
+		FieldInfo * a_field = new FieldInfo(
+			f_name, $2, flag_info_vec);
+		field_info_vec.push_back(a_field);
+		flag_info_vec.resize(0);
+	}
 	| identifier datatype LSQB RSQB  flags {
 	  	string f_name = *$1;
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -207,6 +219,9 @@ datatype : BIGINT  //{ $$ = DataType.bigint }
 	 | TIMESTAMP WITH TIME ZONE //{ $$ = DataType.date_time_with_timez }
 	 | INTEGER //{ $$ = DataType.integer }
 	 | BOOLEAN //{ $$ = DataType.boolean }
+	 | CHARACTER VARYING
+	 | CHARACTER VARYING '(' number ')'
+	 | JSONB
 	 ;
 
 flags:
@@ -238,9 +253,15 @@ flag:
 		flag_info_vec.push_back(new DefaultNumber($2));
 	}
 	| DEFAULT now '(' ')' {
+		// todo incorrect
+		flag_info_vec.push_back(new DefaultNow());
+	}
+	| DEFAULT EMPTY_JSON CAST_TO_JSONB {
+		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
 	| DEFAULT TEXT_VAL   {
+		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
 	| NOT NULLL {

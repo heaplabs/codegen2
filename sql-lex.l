@@ -81,6 +81,10 @@ CACHE {
 }
 
 
+jsonb {
+	return JSONB;
+}
+
 [tT][iI][mM][eE][sS][tT][aA][mM][pP] {
 
 	return TIMESTAMP;
@@ -229,6 +233,14 @@ CHECK {
 	return CHECK;
 }
 
+character {
+	return CHARACTER;
+}
+
+varying {
+	return VARYING;
+}
+
 "<>" {
 	return NE;
 }
@@ -264,11 +276,26 @@ SET {
 	++n_lines;
 }
 
+"'{}'" {
+	return EMPTY_JSON;
+}
+
 "'" {
 	return QUOTE ;
 }
 
+::jsonb {
+	return CAST_TO_JSONB;
+}
+
+
 "'"[a-zA-Z_][_a-zA-Z0-9]*"'"::text {
+	string * id = new string(yytext);
+	yylval.text_val = id;
+	return TEXT_VAL;
+}
+
+"''"::text {
 	string * id = new string(yytext);
 	yylval.text_val = id;
 	return TEXT_VAL;
