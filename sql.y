@@ -37,6 +37,8 @@
 %token <number> number
 %token <bboolean> BBOOLEAN
 %token <text_val> TEXT_VAL
+%token <bboolean> ON
+%token <bboolean> OFF
 
 %token CREATE TABLE '(' ')' ';' 
 %token BIGINT TEXT TIMESTAMP WITH TIME ZONE INTEGER BOOLEAN
@@ -48,7 +50,7 @@
 %token WARNING
 %token SCHEMA
 %token ALTER TO OWNER
-%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED
+%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE
 
 
 %%
@@ -100,6 +102,7 @@ set_stmt:
 	| SET identifier '=' TEXT_VAL ';'
 	| SET identifier '=' BBOOLEAN ';'
 	| SET identifier '=' WARNING ';'
+	| SET identifier '=' QUOTE QUOTE';'
 	;
 
 create_table_stmt: 

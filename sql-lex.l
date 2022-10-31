@@ -190,6 +190,22 @@ true {
 	return BBOOLEAN;
 }
 
+on {
+	yylval.bboolean = true;
+	return BBOOLEAN;
+}
+
+off {
+	yylval.bboolean = false;
+	return BBOOLEAN;
+}
+
+content {
+	string * id = new string(yytext);
+	yylval.text_val = id;
+	return TEXT_VAL;
+}
+
 false {
 	string s(yytext); 
 	if (s == "true") {
@@ -223,6 +239,10 @@ SET {
 	++n_lines;
 }
 
+"'" {
+	return QUOTE ;
+}
+
 "'"[a-zA-Z_][_a-zA-Z0-9]*"'"::text {
 	string * id = new string(yytext);
 	yylval.text_val = id;
@@ -234,6 +254,7 @@ SET {
 	yylval.text_val = id;
 	return TEXT_VAL;
 }
+
 
 warning {
 	return WARNING;
