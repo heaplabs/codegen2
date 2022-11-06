@@ -122,12 +122,14 @@ extern int yydebug;
     WHERE = 328,
     IS = 329,
     GIN = 330,
-    NE = 331,
-    OR = 332,
-    AND = 333,
-    JSON_FIELD_EXTRACTOR = 334,
-    NUMBER = 335,
-    BBOOLEAN = 336
+    DELETE = 331,
+    CASCADE = 332,
+    NE = 333,
+    OR = 334,
+    AND = 335,
+    JSON_FIELD_EXTRACTOR = 336,
+    NUMBER = 337,
+    BBOOLEAN = 338
   };
 #endif
 
@@ -144,7 +146,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 148 "sql.tab.h"
+#line 150 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -57,6 +57,8 @@
 %token ADD BTREE INDEX USING
 %token GREATEST LEAST LOWER WHERE IS 
 %token GIN
+%token FOREIGN
+%token DELETE CASCADE
 %left NE '='
 %left OR
 %left AND
@@ -127,6 +129,9 @@ alter_table_stmt:
 	| ALTER TABLE ONLY identifier '.' identifier ALTER COLUMN identifier SET DEFAULT NEXTVAL '(' CAST_TO_REG_CLASS ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY '(' expr_list ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE '(' expr_list ')' ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ON DELETE SET NULLL ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ON DELETE CASCADE ';'
 	;
 
 	// we are going to discard these set statements 

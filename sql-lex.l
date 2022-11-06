@@ -203,6 +203,18 @@ PostgresToScala {
 	return PostgresToScala;
 }
 
+FOREIGN {
+	return FOREIGN;
+}
+
+DELETE {
+	return DELETE;
+}
+
+CASCADE {
+	return CASCADE;
+}
+
 
 [ \t]+ {
 	// discard whitespace
