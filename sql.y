@@ -34,8 +34,6 @@
 %nterm <datatype>  datatype
 //%nterm <DataType*>  data_type
 %token <identifier> identifier
-%token <number> number
-%token <bboolean> BBOOLEAN
 %token <text_val> TEXT_VAL
 %token <bboolean> ON
 %token <bboolean> OFF
@@ -58,9 +56,13 @@
 %token ONLY COLUMN NEXTVAL CAST_TO_REG_CLASS
 %token ADD BTREE INDEX USING
 %token GREATEST LEAST LOWER WHERE IS 
+%token GIN
 %left NE '='
 %left OR
 %left AND
+%token JSON_FIELD_EXTRACTOR
+%token <number> NUMBER
+%token <bboolean> BBOOLEAN
 
 
 %%
@@ -86,18 +88,18 @@ alter_seq_stmt:
 
 create_seq_stmt : 
 	CREATE SEQUENCE identifier '.' identifier 
-	START WITH number
-	INCREMENT BY number
+	START WITH NUMBER
+	INCREMENT BY NUMBER
 	NO MINVALUE
 	NO MAXVALUE
-	CACHE number ';'
+	CACHE NUMBER ';'
 	| CREATE SEQUENCE identifier '.' identifier 
 	  AS datatype
-	  START WITH number
-	  INCREMENT BY number
+	  START WITH NUMBER
+	  INCREMENT BY NUMBER
 	  NO MINVALUE
 	  NO MAXVALUE
-	  CACHE number ';'
+	  CACHE NUMBER ';'
 	;
 
 create_index_stmt:
@@ -105,6 +107,8 @@ create_index_stmt:
 	| CREATE UNIQUE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' WHERE expr ';' 
 	| CREATE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' WHERE expr ';'
 	| CREATE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' ';'
+	| CREATE INDEX identifier ON identifier '.' identifier USING GIN '(' expr_list identifier '.' identifier ')' ';'
+	| CREATE INDEX identifier ON identifier '.' identifier USING GIN '(' expr_list identifier '.' identifier ')' WHERE expr ';'
 	;
 
 	// we are going to discard the create schema for now
@@ -127,7 +131,7 @@ alter_table_stmt:
 
 	// we are going to discard these set statements 
 set_stmt: 
-	  SET identifier '=' number ';'
+	  SET identifier '=' NUMBER ';'
 	| SET identifier '=' TEXT_VAL ';'
 	| SET identifier '=' BBOOLEAN ';'
 	| SET identifier '=' WARNING ';'
@@ -240,7 +244,6 @@ expr_list:
 
 expr :
      	identifier NE expr
-     |  '(' expr ')'
      |  LEAST '(' expr_list ')'
      |  GREATEST '(' expr_list ')'
      |  LOWER '(' expr ')'
@@ -248,9 +251,12 @@ expr :
      | identifier IS NULLL
      | identifier IS NOT NULLL
      | BBOOLEAN
+     | NUMBER
      | identifier '=' expr
      | expr AND expr
      | expr OR expr
+     | identifier JSON_FIELD_EXTRACTOR TEXT_VAL
+     |  '(' expr ')'
      ;
 
 datatype : BIGINT  //{ $$ = DataType.bigint }
@@ -260,7 +266,7 @@ datatype : BIGINT  //{ $$ = DataType.bigint }
 	 | INTEGER //{ $$ = DataType.integer }
 	 | BOOLEAN //{ $$ = DataType.boolean }
 	 | CHARACTER VARYING
-	 | CHARACTER VARYING '(' number ')'
+	 | CHARACTER VARYING '(' NUMBER ')'
 	 | JSONB
 	 | DOUBLE PRECISION
 	 ;
@@ -290,7 +296,7 @@ flag:
 	| DEFAULT BBOOLEAN  {
 		flag_info_vec.push_back(new DefaultBoolean($2));
 	}
-	| DEFAULT number  {
+	| DEFAULT NUMBER  {
 		flag_info_vec.push_back(new DefaultNumber($2));
 	}
 	| DEFAULT now '(' ')' {

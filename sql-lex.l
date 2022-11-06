@@ -325,6 +325,10 @@ column {
 	return COLUMN;
 }
 
+gin {
+	return GIN;
+}
+
 
 warning {
 	return WARNING;
@@ -341,10 +345,10 @@ warning {
 	}
 	*/
 
-[0-9]* {
+[0-9]+ {
 	string num_str (yytext);
 	yylval.number = atoi(num_str.c_str());
-	return number;
+	return NUMBER;
 }
 
 SET {
@@ -396,6 +400,10 @@ SET {
 	return TEXT_VAL;
 }
 
+"->>" {
+	return JSON_FIELD_EXTRACTOR;
+}
+
 "'"[a-zA-Z_][_a-zA-Z0-9]*"'" {
 	string * id = new string(yytext);
 	yylval.text_val = id;
@@ -409,7 +417,11 @@ SET {
 	return identifier;
 }
 
-.	return yytext[0];
+.	{
+	std::cout << "return single char token: " << yytext[0] << std::endl;
+	return yytext[0];
+}
+
 
 %%
 
