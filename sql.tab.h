@@ -100,22 +100,32 @@ extern int yydebug;
     HEAP = 306,
     CONSTRAINT = 307,
     CHECK = 308,
-    NE = 309,
-    LSQB = 310,
-    RSQB = 311,
-    CHARACTER = 312,
-    VARYING = 313,
-    JSONB = 314,
-    CAST_TO_JSONB = 315,
-    EMPTY_JSON = 316,
-    AS = 317,
-    DOUBLE = 318,
-    PRECISION = 319,
-    ONLY = 320,
-    COLUMN = 321,
-    NEXTVAL = 322,
-    CAST_TO_REG_CLASS = 323,
-    ADD = 324
+    LSQB = 309,
+    RSQB = 310,
+    CHARACTER = 311,
+    VARYING = 312,
+    JSONB = 313,
+    CAST_TO_JSONB = 314,
+    EMPTY_JSON = 315,
+    AS = 316,
+    DOUBLE = 317,
+    PRECISION = 318,
+    ONLY = 319,
+    COLUMN = 320,
+    NEXTVAL = 321,
+    CAST_TO_REG_CLASS = 322,
+    ADD = 323,
+    BTREE = 324,
+    INDEX = 325,
+    USING = 326,
+    GREATEST = 327,
+    LEAST = 328,
+    LOWER = 329,
+    WHERE = 330,
+    IS = 331,
+    NE = 332,
+    OR = 333,
+    AND = 334
   };
 #endif
 
@@ -132,7 +142,7 @@ union YYSTYPE
 	bool bboolean;
 	string * text_val;
 
-#line 136 "sql.tab.h"
+#line 146 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

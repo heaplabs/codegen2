@@ -267,16 +267,67 @@ character {
 	return CHARACTER;
 }
 
-UNIQUE {
-	return UNIQUE;
+USING {
+	return USING;
+}
+
+INDEX {
+	return INDEX;
+}
+
+btree {
+	return BTREE;
 }
 
 ADD {
 	return ADD;
 }
 
+lower {
+	return LOWER;
+}
+
+GREATEST {
+	return GREATEST;
+}
+
+LEAST {
+	return LEAST;
+}
+
 varying {
 	return VARYING;
+}
+
+
+WHERE {
+	return WHERE;
+}
+
+ON {
+	return ON;
+}
+
+IS {
+	return IS;
+}
+
+
+AND {
+	return AND;
+}
+
+OR {
+	return OR;
+}
+
+column {
+	return COLUMN;
+}
+
+
+warning {
+	return WARNING;
 }
 
 "<>" {
@@ -349,15 +400,6 @@ SET {
 	string * id = new string(yytext);
 	yylval.text_val = id;
 	return TEXT_VAL;
-}
-
-column {
-	return COLUMN;
-}
-
-
-warning {
-	return WARNING;
 }
 
 [a-zA-Z_][_a-zA-Z0-9]* {

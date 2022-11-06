@@ -13,16 +13,16 @@ build/driver.o: driver.cpp common_defs.h sql.tab.h
 	$(CC) -std=c++11 -I. -c $< -o $@
 
 build/common_defs.o: common_defs.cpp common_defs.h
-	$(CC) -std=c++11 -I. -c $< -o $@
+	$(CC) -I. -c $< -o $@
 
 build/sql.tab.o: sql.tab.c sql.tab.h
-	$(CC) -std=c++11 -I. -c $< -o $@
+	$(CC) -I. -c $< -o $@
 
 build/sql-lex.yy.o: sql-lex.yy.c  sql.tab.h sql-lex.l
 	$(CC) -c $< -o $@
 
 sql.tab.h sql.tab.c: sql.y GNUmakefile common_defs.h
-	bison --defines sql.y
+	bison --defines --report=all sql.y
 
 sql-lex.yy.c: sql-lex.l common_defs.h
 	flex --backup -o $@ $<

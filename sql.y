@@ -50,13 +50,17 @@
 %token WARNING
 %token SCHEMA
 %token ALTER TO OWNER
-%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE HEAP CONSTRAINT CHECK NE LSQB RSQB
+%token SEQUENCE START INCREMENT BY NO MINVALUE MAXVALUE CACHE OWNED QUOTE HEAP CONSTRAINT CHECK LSQB RSQB
 %token CHARACTER VARYING
 %token JSONB CAST_TO_JSONB
 %token EMPTY_JSON AS
 %token DOUBLE PRECISION
 %token ONLY COLUMN NEXTVAL CAST_TO_REG_CLASS
-%token UNIQUE ADD
+%token ADD BTREE INDEX USING
+%token GREATEST LEAST LOWER WHERE IS 
+%left NE '='
+%left OR
+%left AND
 
 
 %%
@@ -73,6 +77,7 @@ stmt: create_table_stmt
 	| alter_table_stmt
 	| create_seq_stmt 
 	| alter_seq_stmt
+	| create_index_stmt
 	;
 
 alter_seq_stmt:
@@ -95,6 +100,13 @@ create_seq_stmt :
 	  CACHE number ';'
 	;
 
+create_index_stmt:
+	CREATE UNIQUE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' ';'
+	| CREATE UNIQUE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' WHERE expr ';' 
+	| CREATE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' WHERE expr ';'
+	| CREATE INDEX identifier ON identifier '.' identifier USING BTREE '(' expr_list ')' ';'
+	;
+
 	// we are going to discard the create schema for now
 create_schema_stmt :
 	CREATE SCHEMA identifier ';'
@@ -109,8 +121,8 @@ alter_schema_stmt:
 alter_table_stmt:
 	ALTER TABLE identifier '.' identifier OWNER TO identifier ';'
 	| ALTER TABLE ONLY identifier '.' identifier ALTER COLUMN identifier SET DEFAULT NEXTVAL '(' CAST_TO_REG_CLASS ')' ';'
-	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE expr ';'
-	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY expr ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY '(' expr_list ')' ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE '(' expr_list ')' ';'
 	;
 
 	// we are going to discard these set statements 
@@ -221,10 +233,24 @@ field_defn:
 	| CONSTRAINT identifier CHECK expr
 	;
 
+expr_list:
+	 expr
+	 | expr_list ',' expr
+	 ;
+
 expr :
-     	expr NE expr
+     	identifier NE expr
      |  '(' expr ')'
+     |  LEAST '(' expr_list ')'
+     |  GREATEST '(' expr_list ')'
+     |  LOWER '(' expr ')'
      |  identifier
+     | identifier IS NULLL
+     | identifier IS NOT NULLL
+     | BBOOLEAN
+     | identifier '=' expr
+     | expr AND expr
+     | expr OR expr
      ;
 
 datatype : BIGINT  //{ $$ = DataType.bigint }
