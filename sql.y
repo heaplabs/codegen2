@@ -10,6 +10,7 @@
 	map<string, Table*> table_details;
 	map<string, string> postgres_to_scala_map;
 	map<DataType, string> postgres_to_db_conv_map;
+	vector <string> identifier_list;
 	#include <iostream>
 	using std::cout;
 	using std::endl;
@@ -129,9 +130,11 @@ alter_table_stmt:
 	| ALTER TABLE ONLY identifier '.' identifier ALTER COLUMN identifier SET DEFAULT NEXTVAL '(' CAST_TO_REG_CLASS ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY '(' expr_list ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE '(' expr_list ')' ';'
-	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ';'
-	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ON DELETE SET NULLL ';'
-	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' expr_list ')' REFERENCES identifier '.' identifier '(' expr_list ')' ON DELETE CASCADE ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ';' {
+
+	}
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ON DELETE SET NULLL ';'
+	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ON DELETE CASCADE ';'
 	;
 
 	// we are going to discard these set statements 
@@ -241,6 +244,15 @@ field_defn:
 		flag_info_vec.resize(0);
 	}
 	| CONSTRAINT identifier CHECK expr
+	;
+
+identifier_list:
+	  identifier {
+		identifier_list.push_back(*$1);
+	}
+	| identifier_list ',' identifier {
+		identifier_list.push_back(*$3);
+	}
 	;
 
 expr_list:
