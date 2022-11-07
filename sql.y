@@ -159,8 +159,9 @@ create_table_stmt:
 		field_info_vec.resize(0);
 	}
 	| CREATE TABLE identifier '.' identifier '(' field_defns ')' ';' {
+		string * schema = $3;
 		string * id = $5;
-		string table_name(*id);
+		string table_name( *schema + string(".") +  *id );
 		Table * t = new Table(table_name, field_info_vec);
 		$$ = t;
 		table_details[table_name] = t;

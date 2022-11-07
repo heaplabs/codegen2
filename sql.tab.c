@@ -591,12 +591,12 @@ static const yytype_int16 yyrline[] =
        0,    72,    72,    73,    76,    78,    79,    80,    81,    82,
       83,    84,    88,    92,    98,   108,   109,   110,   111,   112,
      113,   118,   123,   128,   129,   130,   131,   132,   133,   134,
-     139,   140,   141,   142,   143,   144,   148,   161,   203,   204,
-     208,   215,   224,   233,   242,   246,   247,   251,   252,   253,
-     254,   255,   256,   257,   258,   259,   260,   261,   262,   263,
-     264,   267,   268,   269,   270,   271,   272,   273,   274,   275,
-     276,   280,   281,   285,   288,   295,   298,   301,   304,   307,
-     311,   315,   319,   322
+     139,   140,   141,   142,   143,   144,   148,   161,   204,   205,
+     209,   216,   225,   234,   243,   247,   248,   252,   253,   254,
+     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   268,   269,   270,   271,   272,   273,   274,   275,   276,
+     277,   281,   282,   286,   289,   296,   299,   302,   305,   308,
+     312,   316,   320,   323
 };
 #endif
 
@@ -1853,8 +1853,9 @@ yyreduce:
   case 37:
 #line 161 "sql.y"
                                                                          {
+		string * schema = (yyvsp[-6].identifier);
 		string * id = (yyvsp[-4].identifier);
-		string table_name(*id);
+		string table_name( *schema + string(".") +  *id );
 		Table * t = new Table(table_name, field_info_vec);
 		(yyval.table) = t;
 		table_details[table_name] = t;
@@ -1865,11 +1866,11 @@ yyreduce:
 			<< endl;
 		field_info_vec.resize(0);
 	}
-#line 1869 "sql.tab.c"
+#line 1870 "sql.tab.c"
     break;
 
   case 40:
-#line 208 "sql.y"
+#line 209 "sql.y"
                             {
 	  	string f_name = *(yyvsp[-1].identifier);
 		cout << "parsing " << f_name << " without flags " << endl;
@@ -1877,11 +1878,11 @@ yyreduce:
 		FieldInfo * a_field = new FieldInfo(f_name, (yyvsp[0].datatype));
 		field_info_vec.push_back(a_field);
 	}
-#line 1881 "sql.tab.c"
+#line 1882 "sql.tab.c"
     break;
 
   case 41:
-#line 215 "sql.y"
+#line 216 "sql.y"
                                      {
 	  	string f_name = *(yyvsp[-2].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1891,11 +1892,11 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1895 "sql.tab.c"
+#line 1896 "sql.tab.c"
     break;
 
   case 42:
-#line 224 "sql.y"
+#line 225 "sql.y"
                                          {
 	  	string f_name = *(yyvsp[-3].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1905,11 +1906,11 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1909 "sql.tab.c"
+#line 1910 "sql.tab.c"
     break;
 
   case 43:
-#line 233 "sql.y"
+#line 234 "sql.y"
                                                {
 	  	string f_name = *(yyvsp[-4].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1919,19 +1920,19 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1923 "sql.tab.c"
+#line 1924 "sql.tab.c"
     break;
 
   case 73:
-#line 285 "sql.y"
+#line 286 "sql.y"
                     {
 		flag_info_vec.push_back(new PrimaryKey());
 	}
-#line 1931 "sql.tab.c"
+#line 1932 "sql.tab.c"
     break;
 
   case 74:
-#line 288 "sql.y"
+#line 289 "sql.y"
                                                                {
 		string table_name = *(yyvsp[-3].identifier);
 		string field_name = *(yyvsp[-1].identifier);
@@ -1939,86 +1940,86 @@ yyreduce:
 			new ForeignKey(table_name, field_name)
 		);
 	}
-#line 1943 "sql.tab.c"
+#line 1944 "sql.tab.c"
     break;
 
   case 75:
-#line 295 "sql.y"
+#line 296 "sql.y"
                     {
 		flag_info_vec.push_back(new TenantId());
 	}
-#line 1951 "sql.tab.c"
+#line 1952 "sql.tab.c"
     break;
 
   case 76:
-#line 298 "sql.y"
+#line 299 "sql.y"
                      {
 		flag_info_vec.push_back(new SearchKey());
 	}
-#line 1959 "sql.tab.c"
+#line 1960 "sql.tab.c"
     break;
 
   case 77:
-#line 301 "sql.y"
+#line 302 "sql.y"
                             {
 		flag_info_vec.push_back(new DefaultBoolean((yyvsp[0].bboolean)));
 	}
-#line 1967 "sql.tab.c"
+#line 1968 "sql.tab.c"
     break;
 
   case 78:
-#line 304 "sql.y"
+#line 305 "sql.y"
                           {
 		flag_info_vec.push_back(new DefaultNumber((yyvsp[0].number)));
 	}
-#line 1975 "sql.tab.c"
+#line 1976 "sql.tab.c"
     break;
 
   case 79:
-#line 307 "sql.y"
+#line 308 "sql.y"
                               {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 1984 "sql.tab.c"
+#line 1985 "sql.tab.c"
     break;
 
   case 80:
-#line 311 "sql.y"
+#line 312 "sql.y"
                                            {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 1993 "sql.tab.c"
+#line 1994 "sql.tab.c"
     break;
 
   case 81:
-#line 315 "sql.y"
+#line 316 "sql.y"
                              {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 2002 "sql.tab.c"
+#line 2003 "sql.tab.c"
     break;
 
   case 82:
-#line 319 "sql.y"
+#line 320 "sql.y"
                     {
 		flag_info_vec.push_back(new NotNull());
 	}
-#line 2010 "sql.tab.c"
+#line 2011 "sql.tab.c"
     break;
 
   case 83:
-#line 322 "sql.y"
+#line 323 "sql.y"
                  {
 		flag_info_vec.push_back(new UniqueKey());
 	}
-#line 2018 "sql.tab.c"
+#line 2019 "sql.tab.c"
     break;
 
 
-#line 2022 "sql.tab.c"
+#line 2023 "sql.tab.c"
 
         default: break;
       }
@@ -2262,5 +2263,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 329 "sql.y"
+#line 330 "sql.y"
 
