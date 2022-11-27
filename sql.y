@@ -202,6 +202,7 @@ create_table_stmt:
 			<< "field_info_vec sz: "
 			<< field_info_vec.size()
 			<< endl;
+		/*
 		std::set<string> dependencies;
 		for (int i = 0; i < field_info_vec.size(); ++i) {
 			FieldInfo * fi = field_info_vec[i];
@@ -209,10 +210,15 @@ create_table_stmt:
 				FlagInfo * flg_inf = flag_info_vec[j];
 				if (flg_inf->isForeignKey()) {
 					ForeignKey * foreign_key = (ForeignKey *) flg_inf;
-					dependencies.insert( foreign_key->table_name + string(".") + foreign_key->field_name);
+					string depends_on(foreign_key->table_name + string(".") + foreign_key->field_name);
+					cout << "got dependency : " << depends_on << endl;
+					dependencies.insert(depends_on) ;
 				}
 			}
 		}
+		*/
+		std::set<string> dependencies = check_dependencies(field_info_vec); 
+
 		table_relations.insert(std::pair<string, std::set<string>>{table_name, dependencies});
 		field_info_vec.resize(0);
 	}

@@ -869,6 +869,10 @@ struct Table {
 
 };
 
+std::set<std::string> check_dependencies(
+		vector<FieldInfo*> & field_info_vec
+		);
+
 void generate_scala_play( const map<string,
 	Table*> & table_details);
 
