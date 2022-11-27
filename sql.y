@@ -234,6 +234,8 @@ create_table_stmt:
 			<< "field_info_vec sz: "
 			<< field_info_vec.size()
 			<< endl;
+		std::set<string> dependencies = check_dependencies(field_info_vec); 
+		table_relations.insert(std::pair<string, std::set<string>>{table_name, dependencies});
 		field_info_vec.resize(0);
 	}
 	;
