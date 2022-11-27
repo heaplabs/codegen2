@@ -14,6 +14,9 @@
 	#include <iostream>
 	using std::cout;
 	using std::endl;
+	#include "graph.h"
+
+	std::map<std::string, std::set<std::string>> table_relations;
 %}
 
 %union {
@@ -23,6 +26,7 @@
 	int number;
 	bool bboolean;
 	string * text_val;
+	vector<string> * identifier_list;
 }
 
 //%define api.value.type union
@@ -32,6 +36,7 @@
 //%token <std::string*> table_name identifier
 //%token <datatype> datatype
 %nterm <table>  create_table_stmt
+%nterm <identifier_list>  identifier_list
 %nterm <datatype>  datatype
 //%nterm <DataType*>  data_type
 %token <identifier> identifier
@@ -131,6 +136,44 @@ alter_table_stmt:
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier PRIMARY KEY '(' expr_list ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier UNIQUE '(' expr_list ')' ';'
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ';' {
+		string source_schema = *$4;
+		string source_table = *$6;
+		string target_schema = *$16;
+		string target_table = *$18;
+		vector<string> & source_table_keys = * $13;
+		vector<string> & target_table_keys = * $20;
+		cout << "got ALTER TABLE FOREIGN KEY"
+			<< "source table : " << source_table 
+			<< endl;
+		cout << ", source keys : " << endl;
+		for (map<string, Table *> ::iterator it = table_details.begin();
+			it != table_details.end(); ++it) {
+			cout << "table name: " << it->first 
+				<< endl;
+		}
+		string source_key = source_schema + string(".") + source_table;
+		cout << "source_key: " << source_key << endl;
+		auto source_table_itr = table_details.find(source_key);
+		if (source_table_itr == table_details.end() ) {
+			cout << "source_table: " <<  source_table << " not found exiting" << endl;
+			exit(0);
+		}
+		Table * source_table_ptr = source_table_itr->second;
+		auto target_table_itr = table_details.find(target_schema + string(".") +  target_table);
+		if (target_table_itr == table_details.end() ) {
+			cout << "target_table: " << target_table << " not found exiting" << endl;
+			exit(0);
+		}
+		Table * target_table_ptr = target_table_itr->second;
+
+		for (int i = 0; i < source_table_keys.size(); ++i) {
+			cout << source_table_keys[i] << endl;
+		}
+		cout << "target table : " << target_table;
+		cout << ", target keys" << endl;
+		for (int i = 0; i < target_table_keys.size(); ++i) {
+			cout << target_table_keys[i] << endl;
+		}
 
 	}
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ON DELETE SET NULLL ';'
@@ -159,6 +202,18 @@ create_table_stmt:
 			<< "field_info_vec sz: "
 			<< field_info_vec.size()
 			<< endl;
+		std::set<string> dependencies;
+		for (int i = 0; i < field_info_vec.size(); ++i) {
+			FieldInfo * fi = field_info_vec[i];
+			for (int j = 0; j < fi->flag_info_vec.size(); ++j) {
+				FlagInfo * flg_inf = flag_info_vec[j];
+				if (flg_inf->isForeignKey()) {
+					ForeignKey * foreign_key = (ForeignKey *) flg_inf;
+					dependencies.insert( foreign_key->table_name + string(".") + foreign_key->field_name);
+				}
+			}
+		}
+		table_relations.insert(std::pair<string, std::set<string>>{table_name, dependencies});
 		field_info_vec.resize(0);
 	}
 	| CREATE TABLE identifier '.' identifier '(' field_defns ')' ';' {
@@ -248,10 +303,17 @@ field_defn:
 
 identifier_list:
 	  identifier {
-		identifier_list.push_back(*$1);
+		//identifier_list.push_back(*$1);
+		vector<string> * ptr = new vector<string>;
+		ptr->push_back(*$1);
+		//vector<string> & v = *ptr;
+		//v.push_back(*$1);
+		$$ = ptr;
 	}
 	| identifier_list ',' identifier {
 		identifier_list.push_back(*$3);
+		$1->push_back(*$3);
+		$$ = $1;
 	}
 	;
 

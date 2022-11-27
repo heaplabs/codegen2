@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <cctype>
+#include <set>
 using std::string;
 using std::vector;
 using std::map;

@@ -137,7 +137,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 19 "sql.y"
+#line 22 "sql.y"
 
 	struct Table * table;
 	DataType datatype;
@@ -145,8 +145,9 @@ union YYSTYPE
 	int number;
 	bool bboolean;
 	string * text_val;
+	vector<string> * identifier_list;
 
-#line 150 "sql.tab.h"
+#line 151 "sql.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
