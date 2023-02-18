@@ -135,7 +135,7 @@ struct UniqueKey: public FlagInfo {
 
 
 enum DataType {
-	bigint, text, boolean, integer, date_time_with_timez
+	bigint=1001, text, boolean, integer, date_time_with_timez
 };
 
 string capitaliseSingular(string s);

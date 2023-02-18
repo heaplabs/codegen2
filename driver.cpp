@@ -1,8 +1,11 @@
 #include "common_defs.h"
 #include "sql.tab.h"
 #include "graph.h"
+#include <algorithm>
+#include "seed_db.h"
 
 extern map<string, Table*> table_details;
+extern std::map<std::string, std::set<std::string>> table_relations;
 
 #include <iostream>
 
@@ -163,6 +166,19 @@ int main() {
 			<< endl;
 		exit(2);
 	}
+	Graph g (table_relations);
+	deque<pair<string, int> >  order = g.topological_sort();
+	sort(order.begin(), order.end(), [] (const pair<string, int> & p1, const pair<string, int> & p2) {
+		//if (p1.second < p2.second) {
+		//		
+		//}
+		return p1.second > p2.second;
+	});
+	for (int i = 0; i < order.size(); ++i) {
+		cout << order[i].first << ", " << order[i].second << endl;
+	}
+
+	generate_data_seeding(order);
 
 	// print_table_details(table_details);
 	// Graph g = build_table_relations_graph(table_details);

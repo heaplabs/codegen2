@@ -159,7 +159,8 @@ alter_table_stmt:
 			exit(0);
 		}
 		Table * source_table_ptr = source_table_itr->second;
-		auto target_table_itr = table_details.find(target_schema + string(".") +  target_table);
+		string target_key = target_schema + string(".") + target_table;
+		auto target_table_itr = table_details.find(target_key);
 		if (target_table_itr == table_details.end() ) {
 			cout << "target_table: " << target_table << " not found exiting" << endl;
 			exit(0);
@@ -174,6 +175,19 @@ alter_table_stmt:
 		for (int i = 0; i < target_table_keys.size(); ++i) {
 			cout << target_table_keys[i] << endl;
 		}
+		if (table_relations.find(source_key) == table_relations.end()) {
+			cout << "source_key: " << source_key << " not found in table_relations" << endl; 
+		}
+		if (table_relations.find(target_key) == table_relations.end()) {
+			cout << "target_key: " << target_key << " not found in table_relations" << endl; 
+		}
+		// safe to pull stuff from table_relations
+		std::set<string> dependencies = table_relations[source_key];
+		dependencies.insert(target_key);
+		table_relations[source_key] = dependencies;
+		cout << " found relation : " 
+			<< " source: " << source_key << " -> " << " dest: " << target_key 
+			<< endl;
 
 	}
 	| ALTER TABLE ONLY identifier '.' identifier ADD CONSTRAINT identifier FOREIGN KEY '(' identifier_list ')' REFERENCES identifier '.' identifier '(' identifier_list ')' ON DELETE SET NULLL ';'

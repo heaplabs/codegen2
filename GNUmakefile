@@ -1,6 +1,6 @@
 
 OBJS= build/sql.tab.o build/sql-lex.yy.o build/driver.o \
-      build/common_defs.o build/top_sort.o
+      build/common_defs.o build/top_sort.o build/seed_db.o
 SRC=sql.y sql-lex.l
 CC=g++ -g -O0 -std=c++17
 
@@ -10,6 +10,9 @@ code_gen.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS) -lstdc++fs
 
 build/driver.o: driver.cpp common_defs.h sql.tab.h
+	$(CC) -std=c++11 -I. -c $< -o $@
+
+build/seed_db.o: seed_db.cpp seed_db.h common_defs.h
 	$(CC) -std=c++11 -I. -c $< -o $@
 
 build/common_defs.o: common_defs.cpp common_defs.h

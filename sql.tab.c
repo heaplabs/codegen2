@@ -595,13 +595,13 @@ static const yytype_int16 yyrline[] =
 {
        0,    78,    78,    79,    82,    84,    85,    86,    87,    88,
       89,    90,    94,    98,   104,   114,   115,   116,   117,   118,
-     119,   124,   129,   134,   135,   136,   137,   138,   179,   180,
-     185,   186,   187,   188,   189,   190,   194,   225,   270,   271,
-     275,   282,   291,   300,   309,   313,   321,   329,   330,   334,
-     335,   336,   337,   338,   339,   340,   341,   342,   343,   344,
-     345,   346,   347,   350,   351,   352,   353,   354,   355,   356,
-     357,   358,   359,   363,   364,   368,   371,   378,   381,   384,
-     387,   390,   394,   398,   402,   405
+     119,   124,   129,   134,   135,   136,   137,   138,   193,   194,
+     199,   200,   201,   202,   203,   204,   208,   239,   284,   285,
+     289,   296,   305,   314,   323,   327,   335,   343,   344,   348,
+     349,   350,   351,   352,   353,   354,   355,   356,   357,   358,
+     359,   360,   361,   364,   365,   366,   367,   368,   369,   370,
+     371,   372,   373,   377,   378,   382,   385,   392,   395,   398,
+     401,   404,   408,   412,   416,   419
 };
 #endif
 
@@ -1861,7 +1861,8 @@ yyreduce:
 			exit(0);
 		}
 		Table * source_table_ptr = source_table_itr->second;
-		auto target_table_itr = table_details.find(target_schema + string(".") +  target_table);
+		string target_key = target_schema + string(".") + target_table;
+		auto target_table_itr = table_details.find(target_key);
 		if (target_table_itr == table_details.end() ) {
 			cout << "target_table: " << target_table << " not found exiting" << endl;
 			exit(0);
@@ -1876,13 +1877,26 @@ yyreduce:
 		for (int i = 0; i < target_table_keys.size(); ++i) {
 			cout << target_table_keys[i] << endl;
 		}
+		if (table_relations.find(source_key) == table_relations.end()) {
+			cout << "source_key: " << source_key << " not found in table_relations" << endl; 
+		}
+		if (table_relations.find(target_key) == table_relations.end()) {
+			cout << "target_key: " << target_key << " not found in table_relations" << endl; 
+		}
+		// safe to pull stuff from table_relations
+		std::set<string> dependencies = table_relations[source_key];
+		dependencies.insert(target_key);
+		table_relations[source_key] = dependencies;
+		cout << " found relation : " 
+			<< " source: " << source_key << " -> " << " dest: " << target_key 
+			<< endl;
 
 	}
-#line 1882 "sql.tab.c"
+#line 1896 "sql.tab.c"
     break;
 
   case 36:
-#line 194 "sql.y"
+#line 208 "sql.y"
                                                         {
 		string * id = (yyvsp[-4].identifier);
 		string table_name(*id);
@@ -1914,11 +1928,11 @@ yyreduce:
 		table_relations.insert(std::pair<string, std::set<string>>{table_name, dependencies});
 		field_info_vec.resize(0);
 	}
-#line 1918 "sql.tab.c"
+#line 1932 "sql.tab.c"
     break;
 
   case 37:
-#line 225 "sql.y"
+#line 239 "sql.y"
                                                                          {
 		string * schema = (yyvsp[-6].identifier);
 		string * id = (yyvsp[-4].identifier);
@@ -1935,11 +1949,11 @@ yyreduce:
 		table_relations.insert(std::pair<string, std::set<string>>{table_name, dependencies});
 		field_info_vec.resize(0);
 	}
-#line 1939 "sql.tab.c"
+#line 1953 "sql.tab.c"
     break;
 
   case 40:
-#line 275 "sql.y"
+#line 289 "sql.y"
                             {
 	  	string f_name = *(yyvsp[-1].identifier);
 		cout << "parsing " << f_name << " without flags " << endl;
@@ -1947,11 +1961,11 @@ yyreduce:
 		FieldInfo * a_field = new FieldInfo(f_name, (yyvsp[0].datatype));
 		field_info_vec.push_back(a_field);
 	}
-#line 1951 "sql.tab.c"
+#line 1965 "sql.tab.c"
     break;
 
   case 41:
-#line 282 "sql.y"
+#line 296 "sql.y"
                                      {
 	  	string f_name = *(yyvsp[-2].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1961,11 +1975,11 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1965 "sql.tab.c"
+#line 1979 "sql.tab.c"
     break;
 
   case 42:
-#line 291 "sql.y"
+#line 305 "sql.y"
                                          {
 	  	string f_name = *(yyvsp[-3].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1975,11 +1989,11 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1979 "sql.tab.c"
+#line 1993 "sql.tab.c"
     break;
 
   case 43:
-#line 300 "sql.y"
+#line 314 "sql.y"
                                                {
 	  	string f_name = *(yyvsp[-4].identifier);
 		cout << "parsing " << f_name << " with flags " << endl;
@@ -1989,11 +2003,11 @@ yyreduce:
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
-#line 1993 "sql.tab.c"
+#line 2007 "sql.tab.c"
     break;
 
   case 45:
-#line 313 "sql.y"
+#line 327 "sql.y"
                      {
 		//identifier_list.push_back(*$1);
 		vector<string> * ptr = new vector<string>;
@@ -2002,29 +2016,29 @@ yyreduce:
 		//v.push_back(*$1);
 		(yyval.identifier_list) = ptr;
 	}
-#line 2006 "sql.tab.c"
+#line 2020 "sql.tab.c"
     break;
 
   case 46:
-#line 321 "sql.y"
+#line 335 "sql.y"
                                          {
 		identifier_list.push_back(*(yyvsp[0].identifier));
 		(yyvsp[-2].identifier_list)->push_back(*(yyvsp[0].identifier));
 		(yyval.identifier_list) = (yyvsp[-2].identifier_list);
 	}
-#line 2016 "sql.tab.c"
+#line 2030 "sql.tab.c"
     break;
 
   case 75:
-#line 368 "sql.y"
+#line 382 "sql.y"
                     {
 		flag_info_vec.push_back(new PrimaryKey());
 	}
-#line 2024 "sql.tab.c"
+#line 2038 "sql.tab.c"
     break;
 
   case 76:
-#line 371 "sql.y"
+#line 385 "sql.y"
                                                                {
 		string table_name = *(yyvsp[-3].identifier);
 		string field_name = *(yyvsp[-1].identifier);
@@ -2032,86 +2046,86 @@ yyreduce:
 			new ForeignKey(table_name, field_name)
 		);
 	}
-#line 2036 "sql.tab.c"
+#line 2050 "sql.tab.c"
     break;
 
   case 77:
-#line 378 "sql.y"
+#line 392 "sql.y"
                     {
 		flag_info_vec.push_back(new TenantId());
 	}
-#line 2044 "sql.tab.c"
+#line 2058 "sql.tab.c"
     break;
 
   case 78:
-#line 381 "sql.y"
+#line 395 "sql.y"
                      {
 		flag_info_vec.push_back(new SearchKey());
 	}
-#line 2052 "sql.tab.c"
+#line 2066 "sql.tab.c"
     break;
 
   case 79:
-#line 384 "sql.y"
+#line 398 "sql.y"
                             {
 		flag_info_vec.push_back(new DefaultBoolean((yyvsp[0].bboolean)));
 	}
-#line 2060 "sql.tab.c"
+#line 2074 "sql.tab.c"
     break;
 
   case 80:
-#line 387 "sql.y"
+#line 401 "sql.y"
                           {
 		flag_info_vec.push_back(new DefaultNumber((yyvsp[0].number)));
 	}
-#line 2068 "sql.tab.c"
+#line 2082 "sql.tab.c"
     break;
 
   case 81:
-#line 390 "sql.y"
+#line 404 "sql.y"
                               {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 2077 "sql.tab.c"
+#line 2091 "sql.tab.c"
     break;
 
   case 82:
-#line 394 "sql.y"
+#line 408 "sql.y"
                                            {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 2086 "sql.tab.c"
+#line 2100 "sql.tab.c"
     break;
 
   case 83:
-#line 398 "sql.y"
+#line 412 "sql.y"
                              {
 		// todo incorrect
 		flag_info_vec.push_back(new DefaultNow());
 	}
-#line 2095 "sql.tab.c"
+#line 2109 "sql.tab.c"
     break;
 
   case 84:
-#line 402 "sql.y"
+#line 416 "sql.y"
                     {
 		flag_info_vec.push_back(new NotNull());
 	}
-#line 2103 "sql.tab.c"
+#line 2117 "sql.tab.c"
     break;
 
   case 85:
-#line 405 "sql.y"
+#line 419 "sql.y"
                  {
 		flag_info_vec.push_back(new UniqueKey());
 	}
-#line 2111 "sql.tab.c"
+#line 2125 "sql.tab.c"
     break;
 
 
-#line 2115 "sql.tab.c"
+#line 2129 "sql.tab.c"
 
         default: break;
       }
@@ -2355,5 +2369,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 412 "sql.y"
+#line 426 "sql.y"
 
