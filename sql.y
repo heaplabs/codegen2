@@ -288,35 +288,41 @@ field_defns:
 field_defn:
 	identifier datatype {
 	  	string f_name = *$1;
-		cout << "parsing " << f_name << " without flags " << endl;
-	  	//string f_type = *$2;
-		FieldInfo * a_field = new FieldInfo(f_name, $2);
+	  	DataType f_type = $2;
+		cout << "parsing " << f_name 
+			<< " without flags "
+			<< " datatype: " << f_type
+			<< endl;
+		FieldInfo * a_field = new FieldInfo(f_name, f_type);
 		field_info_vec.push_back(a_field);
 	}
 	| identifier datatype  flags {
 	  	string f_name = *$1;
-		cout << "parsing " << f_name << " with flags " << endl;
-	  	//string f_type = *$2;
+	  	DataType f_type = $2;
+		cout << "parsing " << f_name
+			<< " datatype: " << f_type
+			<< " with flags "
+			<< endl;
 		FieldInfo * a_field = new FieldInfo(
-			f_name, $2, flag_info_vec);
+			f_name, f_type, flag_info_vec);
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
 	| identifier datatype LSQB RSQB  {
 	  	string f_name = *$1;
-		cout << "parsing " << f_name << " with flags " << endl;
-	  	//string f_type = *$2;
+		cout << "parsing " << f_name << " array without flags " << endl;
+	  	DataType f_type = $2;
 		FieldInfo * a_field = new FieldInfo(
-			f_name, $2, flag_info_vec);
+			f_name, f_type, flag_info_vec);
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
 	| identifier datatype LSQB RSQB  flags {
 	  	string f_name = *$1;
-		cout << "parsing " << f_name << " with flags " << endl;
-	  	//string f_type = *$2;
+		cout << "parsing " << f_name << " array with flags " << endl;
+	  	DataType f_type = $2;
 		FieldInfo * a_field = new FieldInfo(
-			f_name, $2, flag_info_vec);
+			f_name, f_type, flag_info_vec);
 		field_info_vec.push_back(a_field);
 		flag_info_vec.resize(0);
 	}
@@ -361,15 +367,15 @@ expr :
      |  '(' expr ')'
      ;
 
-datatype : BIGINT  //{ $$ = DataType.bigint }
-	 | TEXT //{ $$ = DataType.text } 
-	 | TIMESTAMP WITH TIME ZONE //{ $$ = DataType.date_time_with_timez }
-	 | TIMESTAMP WITHOUT TIME ZONE //{ $$ = DataType.date_time_with_timez }
-	 | INTEGER //{ $$ = DataType.integer }
-	 | BOOLEAN //{ $$ = DataType.boolean }
-	 | CHARACTER VARYING
-	 | CHARACTER VARYING '(' NUMBER ')'
-	 | JSONB
+datatype : BIGINT  { $$ = DataType::bigint; }
+	 | TEXT { $$ = DataType::text; } 
+	 | TIMESTAMP WITH TIME ZONE { $$ = DataType::date_time_with_timez; }
+	 | TIMESTAMP WITHOUT TIME ZONE { $$ = DataType::date_time_with_timez; }
+	 | INTEGER { $$ = DataType::integer; }
+	 | BOOLEAN { $$ = DataType::boolean; }
+	 | CHARACTER VARYING { $$ = DataType::text; }
+	 | CHARACTER VARYING '(' NUMBER ')' { $$ = DataType::text; }
+	 | JSONB { $$ = DataType::jsonb; }
 	 | DOUBLE PRECISION
 	 ;
 
