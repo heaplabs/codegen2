@@ -175,7 +175,18 @@ int main() {
 		return p1.second > p2.second;
 	});
 	for (int i = 0; i < order.size(); ++i) {
-		cout << order[i].first << ", " << order[i].second << endl;
+		string table_name = order[i].first;
+
+		cout << table_name << ", " << order[i].second << endl;
+		map<string, Table*>::const_iterator it = table_details.find(table_name);
+		if (it != table_details.end() ) {
+			Table * t = it->second;
+			cout << "found : " << table_name << " in table_details" << endl;
+			cout << t->to_string() << endl;
+		}
+		if (table_relations.find(table_name)!= table_relations.end() ) {
+			cout << "found : " << table_name << " in table_relations" << endl;
+		}
 	}
 
 	generate_data_seeding(order);

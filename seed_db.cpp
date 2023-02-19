@@ -40,10 +40,37 @@ void generate_insert_for_table(
 	stringstream ss_field_values;
 	for (int i = 0; i < t->field_info.size(); ++i) {
 		FieldInfo * f = t->field_info[i];
-		if (f->data_type == bigint) {
-			ss_field_values << "'" << "BIGINT" << "'" ;	
-		} else {
-			ss_field_values << "something_else";	
+		//if (f->data_type == bigint) {
+		//	ss_field_values << "'" << "BIGINT" << "'" ;	
+		//} else if (f->data_type {
+		//} else {
+		//	ss_field_values << "something_else";	
+		//}
+		switch(f->data_type) {
+			case DataType::bigint:
+				ss_field_values << "'" << "BIGINT" << "'";
+				break;
+			case DataType::text:
+				ss_field_values << "'" << "TEXT" << "'";
+				break;
+			case DataType::boolean:
+				ss_field_values << "'" << "BOOLEAN" << "'";
+				break;
+			case DataType::integer:
+				ss_field_values << "'" << "INTEGER" << "'";
+				break;
+			case DataType::date_time_with_timez:
+				ss_field_values << "'" << "date_time_with_timez" << "'";
+				break;
+			case DataType::date_time_without_timez:
+				ss_field_values << "'" << "date_time_without_timez" << "'";
+				break;
+			case DataType::jsonb:
+				ss_field_values << "'" << "jsonb" << "'";
+				break;
+			default:
+				ss_field_values << "'" << "unhandled_field_type" << "'";
+				break;
 		}
 		if (i < t->field_info.size() - 1) {
 			ss_field_values << ", ";
