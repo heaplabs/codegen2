@@ -1676,7 +1676,7 @@ YY_RULE_SETUP
 {
 	string * id = new string(yytext);
 	yylval.identifier = id;
-	std::cout << "return identifier: " << *id << std::endl;
+	//std::cout << "return identifier: " << *id << std::endl;
 	return identifier;
 }
 	YY_BREAK
@@ -1684,7 +1684,7 @@ case 92:
 YY_RULE_SETUP
 #line 432 "sql-lex.l"
 {
-	std::cout << "return single char token: " << yytext[0] << std::endl;
+	//std::cout << "return single char token: " << yytext[0] << std::endl;
 	return yytext[0];
 }
 	YY_BREAK

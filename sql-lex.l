@@ -425,12 +425,12 @@ SET {
 [a-zA-Z_][_a-zA-Z0-9]* {
 	string * id = new string(yytext);
 	yylval.identifier = id;
-	std::cout << "return identifier: " << *id << std::endl;
+	//std::cout << "return identifier: " << *id << std::endl;
 	return identifier;
 }
 
 .	{
-	std::cout << "return single char token: " << yytext[0] << std::endl;
+	//std::cout << "return single char token: " << yytext[0] << std::endl;
 	return yytext[0];
 }
 
